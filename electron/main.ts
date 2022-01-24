@@ -1,14 +1,17 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import * as path from 'path';
 import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
 
+var fs = require('fs');
+
+let win: BrowserWindow;
 function createWindow() {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
       // contextIsolation: false,
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js') // For context bridge to renderer
     }
   })
 
@@ -34,6 +37,11 @@ function createWindow() {
   }
 }
 
+ipcMain.handle("readFile", (event, filepath: string) => {
+    var res = fs.readFileSync(filepath);
+    return res;
+})
+ 
 app.whenReady().then(() => {
   // DevTools
   installExtension(REACT_DEVELOPER_TOOLS)
