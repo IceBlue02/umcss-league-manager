@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai+Looped:wght@100;200;300;400;500;600;700&display=swap');
+
+* {
+    font-family: 'IBM Plex Sans Thai Looped', sans-serif;
+}
+
+.roundcolumn {
+    width: 270px;
+    height: 100%;
+    padding: 5px;
+    background-color: rgb(230, 230, 230);
+}
+
+
+.roundcolumn-title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-left: 10px;
+    width: 250px;
+    text-align: center;
+}
+
+.gridbox {
+    background-color: rgb(255, 255, 255);
+    margin: 10px;
+    width: 250px;
+    height: 70px;
+    display: flex;
+    border-radius: 3px;
+    border-left: 5px solid rgb(255, 255, 255);
+ }
+
+ .playing {
+    border-left: 5px solid rgb(255, 0, 0);
+}
+
+.gridbox-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* width: 15px; */
+}
+
+.gridbox-gameno {
+    text-align: center;
+    width: 2ch;
+    margin: 5px 0 5px 5px;
+    font-weight: 300;
+    font-size: 12px;
+    line-height: 11px;
+    color: rgb(97, 93, 93);
+}
+
+
+.gridbox-right {
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: column;
+}
+
+.gridbox-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.gridbox-row span {
+    margin-left: 10px;
+    height: 15px;
+    line-height: 15px;
+    display: inline-block;
+    text-align: middle;
+}
+
+.name {
+    /* font-weight: ; */
+    margin-left: 2px;
+}
+
+.score {
+    margin-right: 5px;
+    text-justify: right;
+}
+
+.winner {
+    font-weight: bold;
+}

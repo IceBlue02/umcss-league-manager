@@ -17,6 +17,20 @@ class RoundColumn extends React.Component<RoundColumnProps> {
             <GameBox game={this.props.games[i]} key={i}/>
         )
     }
+
+    render() {
+        var rows = [];
+        for (var i = 0; i < this.props.games.length; i++) {
+            rows.push(this.renderGame(i));
+        }
+        console.log(rows);
+        return (       
+            <div className="roundcolumn">
+                <div className="roundcolumn-title">Round {this.props.round}</div>
+                {rows}
+            </div>
+        )   
+    }
 }
 
 type GameBoxProps = {
@@ -78,3 +92,5 @@ class GameBox extends React.Component<GameBoxProps> {
         )
     }
 }
+
+export {RoundColumn, Game};
