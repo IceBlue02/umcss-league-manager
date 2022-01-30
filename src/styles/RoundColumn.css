@@ -1,0 +1,15 @@
+.roundcolumn {
+    width: 270px;
+    height: 100%;
+    padding: 5px;
+    background-color: rgb(230, 230, 230);
+}
+
+
+.roundcolumn-title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-left: 10px;
+    width: 250px;
+    text-align: center;
+}
