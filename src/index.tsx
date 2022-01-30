@@ -1,14 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+import './styles/index.css';
 import {ipcRenderer} from "electron";
 
-
-import {RoundColumn} from './RoundPane';
-import {Player, IPlayer, PlayerList} from './games/Player';
-import Game from './games/Game';
+import Main from "./components/Main"
+import MainWeekView from "./components/MainWeekView"
+import {IPlayer, PlayingState} from './logic/Player';
+import PlayerList from './logic/PlayerList'
+import {Week} from './logic/Week';
 import reportWebVitals from './reportWebVitals';
-import { getJSDocOverrideTagNoCache } from 'typescript';
 
 declare global {
     interface Window {
@@ -42,12 +42,8 @@ async function getJSON(filepath: string): Promise<IPlayer[] | null> {
     return null
 } 
 
-const games = [];
-const games2 = [];
-
 
 const filepath = "/Users/ewan/git/umcss-league-manager/src/data/players.json"
-let playerList: PlayerList
 
 getJSON(filepath)
 .then(jsonData => {
@@ -61,21 +57,22 @@ getJSON(filepath)
 
 
 function renderMain(pl: PlayerList) {
-    const players = pl.getPlayers();
-    const game1 = new Game([players[0], players[1]], 1, 1, undefined, true)
-    const game2 = new Game([players[2], players[3]], 1, 2, [1, 0], false)
-    const game3 = new Game([players[3], players[7]], 1, 3, [0, 1])
-    const game4 = new Game([players[5], players[4]], 1, 4)
-    const games = [game1, game2, game3, game4];
-    const games2 = [game1, game2, game3, game4];
+    var week = new Week(pl);
+    var players = pl.getPlayers();
+
+    for (var player of players) {
+        player.playingState = PlayingState.active;
+    }
+    players[9].playingState = PlayingState.inactive;
+    
+    week.generateInitialRound();
+    week.generateInitialRound();
+    console.log(week.rounds[0].getGames())
+    
 
     ReactDOM.render(
         <React.StrictMode>
-            <div className="round">
-              <RoundColumn games={games} round={1}></RoundColumn>
-              <RoundColumn games={games2} round={2}></RoundColumn>
-            </div> 
-            
+            <Main inweek={week}/>        
         </React.StrictMode>,
         document.getElementById('root')
       );
