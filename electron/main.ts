@@ -7,8 +7,8 @@ var fs = require('fs');
 let win: BrowserWindow;
 function createWindow() {
   win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1600,
+    height: 900,
     webPreferences: {
       // contextIsolation: false,
       preload: path.join(__dirname, 'preload.js') // For context bridge to renderer
@@ -53,6 +53,7 @@ app.whenReady().then(() => {
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
+      console.log("hello");
     }
   });
 

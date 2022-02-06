@@ -6,6 +6,8 @@ import {IPlayer, Player, PlayingState} from "./Player";
 class PlayerList {
     players: Player[];
     
+
+    // TODO- Look at this
     constructor(jsonData: IPlayer[]) {
         console.log(jsonData);
         this.players = [];
