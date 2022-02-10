@@ -45,6 +45,7 @@ class RoundColumn extends React.Component<RoundColumnProps> {
     }
 
     render() {
+        this.games = this.props.round.getGames();
         var rows = [];
         if (this.props.round.bye != null) {
             rows.push(this.renderBye());
