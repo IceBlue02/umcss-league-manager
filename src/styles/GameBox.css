@@ -55,6 +55,7 @@
 .gridbox-row {
     display: flex;
     justify-content: space-between;
+    max-height: 15px;
 }
 
 .gridbox-row span {
@@ -71,10 +72,24 @@
 }
 
 .score {
-    margin-right: 5px;
+    margin-right: 10px;
     text-justify: right;
 }
 
 .winner {
     font-weight: bold;
+}
+
+/* TODO: Sort the box sizing out */
+
+.scoreinput {
+    height: 15px;
+    width: 15px;
+    font-family: 'IBM Plex Sans Thai Looped', sans-serif;
+    border: 1px solid rgb(220, 220, 220);
+    border-radius: 2px;
+    margin: 0 5px;
+    text-align: center;
+
+
 }
