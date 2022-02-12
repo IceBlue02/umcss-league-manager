@@ -51,6 +51,21 @@ class Game {
         this.round = round;
         this.gameno = gameno;
     }
+
+    /**
+     * Checks whether both players have a score inputted and therefore whether the game
+     * is considered finished.
+     *  
+     * @returns true if the game is finished, otherwise false
+     */
+    isFinished(): boolean {
+        if (this.scores[0] != null && this.scores[1] != null) {
+            if (this.scores[0] !== this.scores[1]) {
+                return true
+            }
+        } 
+        return false;
+    }
 }
 
 export default Game
