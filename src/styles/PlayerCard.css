@@ -1,0 +1,50 @@
+
+.pl-card {
+    width: 270px;
+    height: 30px;
+    flex-shrink: 1;
+    margin-top: 5px;
+    padding: 5px;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    background-color: white;
+}
+
+.pl-name {
+    font-weight: 500;
+    min-width: 140px;
+}
+
+.spacer {
+    flex-grow: 10;
+}
+
+.pl-score {
+    margin-right: 5px;
+}
+
+.tag {
+    height: 25px;
+    line-height: 25px;
+    width: 40px;
+    text-align: center;
+    font-weight: 600;
+    border-radius: 3px;
+    color: white;
+    margin: 0 3px;
+}
+
+.ap3-tag {
+    background-color: rgb(20, 93, 250);
+}
+
+.member-tag {
+    background-color: rgb(61, 173, 9);
+    width: 20px;
+}
+
+.not-paid-tag {
+    background-color: rgb(245, 91, 20);
+    width: 20px;
+}

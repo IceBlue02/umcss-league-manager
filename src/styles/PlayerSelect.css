@@ -1,0 +1,89 @@
+.row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.title {
+    font-weight: 700;
+    font-size: 32px;
+}
+
+.row-spacer {
+    width: 80px;
+    height: 20px;
+}
+
+#back-btn {
+    background-color: #660099;
+    color: white;
+    font-size: 24px;
+    width: 80px;
+}
+
+#new-pl-btn {
+    background-color: #660099;
+    color: white;
+    font-size: 20px;
+    min-width: 140px;
+    margin-left: 20px;
+    margin-top: 10px;
+    height: 50px;
+    line-height: 80px;
+    appearance: button;
+}
+
+.column-titles {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.col-title {
+    font-weight: 500;
+    font-size: 24px;
+    width: 300px;
+    text-align: center;
+    margin: 0 10px;
+}
+
+.column-holder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pl-col {
+    height: 600px;
+    width: 300px;
+    margin: 0 10px;
+    padding-top: 5px;
+    flex-shrink: 1;
+    background-color: rgb(230, 230, 230);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: solid 2px rgb(200, 200, 200);
+    border-radius: 3px;
+    overflow-y: scroll;
+}
+
+#away-col {
+    background-color: rgb(211, 227, 231)
+}
+
+#playing-col {
+    background-color: rgb(213, 231, 211)
+}
+
+#not-playing-col {
+    background-color: rgb(231, 211, 211)
+}
+
+.bottom-row {
+    height: 100px;
+}
+
+
+
