@@ -8,15 +8,17 @@ interface IPlayer {
     id: number;
     name: string;
     startingelo: number;
+    member: boolean;
+    ap3: boolean;
 }
 
 /**
 * Represents whether a player is currently participating in the week
 */
 enum PlayingState {
-    active,     // The player is present and should be included in the next round
-    notplaying, // The player is not present
-    inactive    // The player is temporarily away 
+    PLAYING,
+    AWAY,
+    NOTPLAYING
 }
 
 /** 
@@ -25,11 +27,15 @@ enum PlayingState {
 class Player {
     id: number;
     name: string;
+    member: boolean;
+    ap3: boolean;
     startingelo: number;
     currentelo: number;
+    elochange: number = 0;
     inrounds: boolean[];
     byes: (boolean | null)[];
-    playingState: PlayingState = PlayingState.inactive;
+    seed: number;
+    playingState: PlayingState = PlayingState.NOTPLAYING;
 
     /**
      * @constructor
@@ -41,12 +47,16 @@ class Player {
      * @param currentround - The current round. If later in the week, inround and null need to
      * be adjusted to ensure they are consistant with all other players
      */
-    constructor(id: number, name: string, startingelo: number, currentround?: number) {
+    constructor(id: number, name: string, member: boolean, ap3: boolean, startingelo: number, currentround?: number) {
     
         this.id = id;
         this.name = name;
         this.startingelo = startingelo;
         this.currentelo = this.startingelo;
+        this.elochange = 0;
+        this.ap3 = ap3;
+        this.member = member;
+        this.seed = Math.floor(Math.random() * 1000)// Used to order games properly
         this.inrounds = [];
         this.byes = [];
 
@@ -67,9 +77,9 @@ class Player {
      */
     static fromJSON(jsonObj: IPlayer, currentround?: number): Player {
         if (typeof(currentround) != "undefined") {
-            return new Player(jsonObj.id, jsonObj.name, jsonObj.startingelo, currentround);
+            return new Player(jsonObj.id, jsonObj.name, jsonObj.member, jsonObj.ap3, jsonObj.startingelo, currentround);
         } else {
-            return new Player(jsonObj.id, jsonObj.name, jsonObj.startingelo);
+            return new Player(jsonObj.id, jsonObj.name, jsonObj.member, jsonObj.ap3, jsonObj.startingelo);
         }
     }
 }
