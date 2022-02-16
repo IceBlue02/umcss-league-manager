@@ -1,0 +1,57 @@
+
+.menubar {
+    float: top;
+    position: fixed;
+    width: 100%;
+    height: 70px;
+    background-color: #660099;
+    border-bottom: 3px solid #FFCC33;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    overflow-x: scroll;
+}
+
+button, .btn{
+    width: 100px;
+    height: 50px;
+    margin: 10px;
+    border-radius: 3px;
+    background-color: #ffffff;
+    color: #660099;
+    border: 0;
+    font-family: 'IBM Plex Sans Thai Looped', sans-serif;
+    font-weight: 700;
+}
+
+.btn {
+    line-height: 50px;
+    text-align: center;
+    text-decoration: none;
+}
+
+.spacer {
+    flex-grow: 10;
+    min-width: 0;
+}
+
+#logo {
+    height: 50px;
+    margin: 10px;
+}
+#playerMenuButton {
+    border: 0;
+    font-size: 20px;
+}
+
+#genRoundButton {
+    border: 0;
+}
+
+#finishWeekButton {
+    border: 0;
+    color: #FF0000;
+}
+
+
+
