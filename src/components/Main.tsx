@@ -4,6 +4,7 @@ import MainWeekView from "./MainWeekView"
 import MenuBar from "./MenuBar"
 import {Week, Round} from "../logic/Week"
 import PlayerSelect from "./PlayerSelect"
+import {getBackupJSON} from "../logic/FileHandler"
 import EditPlayerBox from "./EditPlayerBox"
 
 import {Player, PlayingState} from "../logic/Player"
@@ -26,6 +27,7 @@ type MainState = {
 
 class Main extends React.Component<MainProps, MainState> {
     state: MainState;
+    sinceBackup: Date;
 
     constructor(props: MainProps) {
         super(props)
@@ -33,6 +35,7 @@ class Main extends React.Component<MainProps, MainState> {
             week: this.props.inweek,
             editPlayer: null
         }
+        this.sinceBackup = new Date();
 
         this.changeScore = this.changeScore.bind(this);
         this.changePlayingState = this.changePlayingState.bind(this);
@@ -42,6 +45,16 @@ class Main extends React.Component<MainProps, MainState> {
         this.playerChanged = this.playerChanged.bind(this);
     }
 
+    restoreFromBackup() {
+        getBackupJSON()
+        .then(jsonData => {
+            if (jsonData !== null) {
+                return Week.fromBackup(jsonData)
+            } else {
+                throw new Error("Something went wrong when generating the player list");
+            }})
+        .then(pl => this.setState(update(this.state, {week: {$set: pl}})))
+    }
 
     changePlayingState(playerID: number, state: PlayingState, newIndx: number) {
         const indx = this.state.week.players.getIndexFromID(playerID)
@@ -57,6 +70,7 @@ class Main extends React.Component<MainProps, MainState> {
             }
         }))
         window.filesys.savePlayerFile(this.state.week.players.getJSON())
+        this.backup()
     }
 
     changeScore(roundno: number, gameno: number, upperScore?: number, lowerScore?: number) {
@@ -95,6 +109,7 @@ class Main extends React.Component<MainProps, MainState> {
                                         [1]: {$set: lowerScore}},
             }}}}}}))
         }
+        this.backup()
     }
 
     generateRound() {
@@ -109,6 +124,7 @@ class Main extends React.Component<MainProps, MainState> {
             week: {
                 rounds: {$push: [round]}
         }}))
+        this.backup()
     }
 
     playerChanged(pl: Player) {
@@ -135,13 +151,26 @@ class Main extends React.Component<MainProps, MainState> {
             }}))
         }
 
+        this.backup()
     }
 
+    backup() {
+        const jsondata = this.state.week.toJSONBackup();
+        window.filesys.saveBackup(jsondata, "backup.json");
+
+        const currenttime = new Date();
+        const minssince = Math.abs((currenttime.getTime() - this.sinceBackup.getTime()) / 60000)
+
+        console.log("mins", minssince)
+        if (minssince > 2) {
+            window.filesys.saveBackup(jsondata, "backup " + currenttime.toISOString() + ".json");
+            this.sinceBackup = currenttime;
         }
 
     }
 
     onWeekEnd() {
+        this.backup()
         //TODO: Week ending logic
         this.state.week.calculateRankings(true);
         this.state.week.getJSON();
