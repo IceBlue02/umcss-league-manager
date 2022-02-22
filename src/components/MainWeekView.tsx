@@ -49,7 +49,6 @@ class MainWeekView extends React.Component<MainWeekViewProps, MainWeekViewState>
     }
 
     oncardclick(round: number, game: number) {
-        console.log("Clicked: ", round, game);
         if (this.state.activeCard != null) {
             if (this.state.activeCard[0] === round && this.state.activeCard[1] === game) {
                 this.setState({activeCard: null})
