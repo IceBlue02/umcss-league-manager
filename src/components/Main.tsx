@@ -84,7 +84,7 @@ class Main extends React.Component<MainProps, MainState> {
                                     scores: {
                                         [0]: {$set: upperScore},
                                         [1]: {$set: lowerScore}},
-            }}}}}}))
+            }}}}}}), () => {this.backup()})
         } 
         else if (upperScore !== undefined) {
             this.setState(update(this.state, {
@@ -95,7 +95,7 @@ class Main extends React.Component<MainProps, MainState> {
                                 [gameno]: {
                                     scores: {
                                         [0]: {$set: upperScore}},
-            }}}}}}))
+            }}}}}}), () => {this.backup()})
         } 
         else if (lowerScore !== undefined) {
             this.setState(update(this.state, {
@@ -106,9 +106,8 @@ class Main extends React.Component<MainProps, MainState> {
                                 [gameno]: {
                                     scores: {
                                         [1]: {$set: lowerScore}},
-            }}}}}}))
+            }}}}}}), () => {this.backup()})
         }
-        this.backup()
     }
 
     generateRound() {
@@ -122,8 +121,7 @@ class Main extends React.Component<MainProps, MainState> {
         this.setState(update(this.state, {
             week: {
                 rounds: {$push: [round]}
-        }}))
-        this.backup()
+        }}), () => {this.backup()})
     }
 
     playerChanged(pl: Player) {
@@ -138,7 +136,7 @@ class Main extends React.Component<MainProps, MainState> {
                             [indx]: {$set: pl}
                         }
                     }
-            }}))
+            }}), () => {this.backup()})
         } else {
             this.setState(update(this.state, {
                 week: {
@@ -147,10 +145,8 @@ class Main extends React.Component<MainProps, MainState> {
                             $push: [pl]
                         }
                     }
-            }}))
+            }}), () => {this.backup()})
         }
-
-        this.backup()
     }
 
     backup() {
@@ -162,7 +158,8 @@ class Main extends React.Component<MainProps, MainState> {
 
         console.log("mins", minssince)
         if (minssince > 2) {
-            window.filesys.saveBackup(jsondata, "backup " + currenttime.toISOString() + ".json");
+            console.log("backup" + currenttime.toISOString().replace(".", "").replace(":", "") + ".json");
+            window.filesys.saveBackup(jsondata, "backup" + currenttime.toISOString().replace(".", "").replace(":", "") + ".json");
             this.sinceBackup = currenttime;
         }
 
