@@ -1,8 +1,10 @@
 
 .pl-card {
-    width: 270px;
-    height: 30px;
-    flex-shrink: 1;
+    user-select: none;
+    width: 290px;
+    height: 27px;
+    flex-shrink: 0;
+    flex-grow: 0;
     margin-top: 5px;
     padding: 5px;
     border-radius: 2px;
@@ -37,14 +39,25 @@
 
 .ap3-tag {
     background-color: rgb(20, 93, 250);
+    width: 40px;
 }
 
 .member-tag {
-    background-color: rgb(61, 173, 9);
+    background-color: rgb(106, 5, 201);
+    width: 20px;
+}
+
+.alumni-tag {
+    background-color: rgb(241, 97, 0);
+    width: 20px;
+}
+
+.paid-tag {
+    background-color:  rgb(61, 173, 9);
     width: 20px;
 }
 
 .not-paid-tag {
-    background-color: rgb(245, 91, 20);
+    background-color: rgb(255, 0, 0);
     width: 20px;
 }

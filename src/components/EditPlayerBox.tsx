@@ -1,5 +1,5 @@
 import React from 'react';
-import {Player} from "../logic/Player"
+import {Player, MembershipType} from "../logic/Player"
 import PlayerList from "../logic/PlayerList"
 import {useLocation, useNavigate} from "react-router-dom"
 import "../styles/PlayerEdit.css"
@@ -58,11 +58,13 @@ function EditPlayerBox (props: EditPlayerBoxProps) {
             var startingelo = parseFloat(parseFloat(startingelotxt).toPrecision(5));
         }
     
-        const member = elements.member.checked 
+        const membership = elements.member.value
+
         const paid = elements.paid.checked
         const ap3 = elements.ap3.checked
     
-        var newPlayer = new Player(id, name, member, ap3, startingelo)
+        var newPlayer = new Player(id, name, membership as MembershipType, ap3, startingelo)
+        newPlayer.paid = paid
     
         props.callbacks.setPlayer(newPlayer)
         
@@ -92,11 +94,14 @@ function EditPlayerBox (props: EditPlayerBoxProps) {
                     </div>
                     <div className="inputholder">
                         <input type="number" id="elo" name="elo"
-                        min="0" max="100" step="0.01" defaultValue={player.startingelo || 0}/>
+                        min="0" max="100" step="0.0001" defaultValue={player.startingelo || 0}/>
                     </div>
                     <div className="inputholder">
-                        <input type="checkbox" id="member" name="member"
-                        defaultChecked={player.member}/>
+                        <select name="member" id="member">
+                            <option selected={player.member == MembershipType.NONE} value="none">None</option>
+                            <option selected={player.member == MembershipType.MEMBER} value="member">Member</option>
+                            <option selected={player.member == MembershipType.ALUMNI} value="alumni">Alumni</option>
+                        </select>
                     </div>
                     <div className="inputholder">
                         <input type="checkbox" id="paid" name="paid"
