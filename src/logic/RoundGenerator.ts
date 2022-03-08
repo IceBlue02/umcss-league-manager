@@ -35,6 +35,38 @@ class RoundGenerator {
         throw new Error("Something went wrong when generating");
     }
 
+    generateRandom(): Round {
+        var players = this.roundplayers;
+        var newRound = new Round(this.week.nextround);
+
+        // Randomly shuffle the player list
+        let shuffled = this.roundplayers
+        .map(value => ({ value, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({ value }) => value)
+
+        if (shuffled.length % 2 === 1) { // If odd number of players, assign the first player a bye
+            let byePlayerID = this.selectBye() 
+            newRound.bye = this.week.players.getPlayerFromID(byePlayerID);
+            players = players.filter(p => p.id !== byePlayerID)
+        }
+
+        // Pair the players in consecutive pairs, based on the randomly ordered list, leading to a random set of games
+        var gameno = 1;
+        while (shuffled.length !== 0) { 
+            let game = new Game([this.week.players.getPlayerFromID(shuffled[0].id), 
+                                this.week.players.getPlayerFromID(shuffled[1].id)], newRound.number, gameno)
+            shuffled = shuffled.slice(2);
+            gameno++
+            newRound.addGame(game);
+        }
+
+        // Order the games based on the ordering scheme
+        newRound.games = RoundGenerator.orderGames(newRound.games);
+
+        return newRound
+    }
+
     generate(): Round {
         var chosenRound;
         var byePlayerID: number;
