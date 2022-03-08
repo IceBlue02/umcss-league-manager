@@ -55,13 +55,12 @@
 .gridbox-row {
     display: flex;
     justify-content: space-between;
-    max-height: 15px;
+    align-items: center;
+    height: 20px;
 }
 
 .gridbox-row span {
     margin-left: 10px;
-    height: 15px;
-    line-height: 15px;
     display: inline-block;
     text-align: middle;
 }
@@ -69,6 +68,7 @@
 .name {
     /* font-weight: ; */
     margin-left: 2px;
+    vertical-align: middle;
 }
 
 .score {
