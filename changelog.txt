@@ -1,0 +1,14 @@
+
+0.7.0 (Initial release)
+-   Generates games according to our custom algorithm
+-   Scoring system
+-   Ability to add new players and change stats
+
+0.7.1
+FEATURES:
+    - CSV ranking export
+FIXES:
+    - Bye week no longer wipes previous points from wins
+    - First week bye selection now takes into account games since bye as with other rounds
+    - Backups are no longer saved without the most recent change
+    - CSS fixed in player selection
