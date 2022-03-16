@@ -1,5 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai+Looped:wght@100;200;300;400;500;600;700&display=swap');
 
+::-webkit-scrollbar {
+  visibility: hidden;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+
 html {
     height: 100%;
     width: auto;
@@ -8,6 +15,10 @@ html {
 body, #root {
     height: 100%;
     width: auto;
+}
+
+body::-webkit-scrollbar {
+  display: auto;
 }
 
 .hidden {

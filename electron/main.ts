@@ -9,6 +9,7 @@ function createWindow() {
   win = new BrowserWindow({
     width: 1600,
     height: 900,
+    icon: path.join(__dirname, 'logo.png'),
     webPreferences: {
       // contextIsolation: false,
       preload: path.join(__dirname, 'preload.js') // For context bridge to renderer
@@ -22,7 +23,6 @@ function createWindow() {
     win.loadURL('http://localhost:3000/index.html');
 
     win.webContents.openDevTools();
-
     // Hot Reloading on 'node_modules/.bin/electronPath'
     require('electron-reload')(__dirname, {
       electron: path.join(__dirname,
@@ -145,8 +145,15 @@ ipcMain.handle("savePlayerFile", (event, jsonstring: string) => {
     fs.writeFileSync(filepath, jsonstring)
 })
 
- 
-app.whenReady().then(() => {
+app.on('ready', createWindow);
+
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      app.quit();
+    }
+});
+
+/*app.whenReady().then(() => {
   // DevTools
   installExtension(REACT_DEVELOPER_TOOLS)
     .then((name) => console.log(`Added Extension:  ${name}`))
@@ -155,7 +162,7 @@ app.whenReady().then(() => {
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
-      win.webContents.openDevTools();
+      //win.webContents.openDevTools();
     }
   });
 
@@ -164,4 +171,4 @@ app.whenReady().then(() => {
       app.quit();
     }
   });
-});
+});*/
