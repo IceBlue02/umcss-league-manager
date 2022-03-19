@@ -170,8 +170,10 @@ class PlayerSelect extends React.Component<PlayerSelectProps, PlayerSelectState>
             <div>
                 <div className="row">
                     <Link id="back-btn" className="btn btn-pink" role="button" to="/">Back</Link>
+                    <div className="spacer" style={{maxWidth: "60px"}}></div>
                     <div className="title">Players</div>  
-                    <div className="row-spacer"></div>
+                    <div className="spacer" style={{maxWidth: "0px"}}></div>
+                    <Link id="new-pl-btn" className="btn btn-pink" role="button" to="/editplayer" state={{player: this.props.players.getNewPlayer()}}>New Player</Link>
                 </div>
                 <div className="column-titles">
                     <div className="col-title">Away</div>
@@ -208,8 +210,8 @@ class PlayerSelect extends React.Component<PlayerSelectProps, PlayerSelectState>
                         </Droppable>
                     </DragDropContext>
                 </div>
-                <div className="bottom-row">
-                    <Link id="new-pl-btn" className="btn btn-pink" role="button" to="/editplayer" state={{player: this.props.players.getNewPlayer()}}>New Player</Link>
+                <div className="row bottom-row">
+                   
                 </div>
             </div>
             

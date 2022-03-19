@@ -26,12 +26,9 @@
     background-color: #660099;
     color: white;
     font-size: 20px;
-    min-width: 140px;
-    margin-left: 20px;
-    margin-top: 10px;
-    height: 50px;
-    line-height: 80px;
-    appearance: button;
+    width: 140px;
+    min-height: 50px;
+    line-height: 50px;
 }
 
 .column-titles {
@@ -55,7 +52,7 @@
 }
 
 .pl-col {
-    height: 800px;
+    height: 650px;
     width: 320px;
     margin: 0 10px;
     padding-top: 5px;
@@ -64,7 +61,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    border: solid 2px rgb(130, 130, 130);
+    border: solid 1px rgb(130, 130, 130);
     border-radius: 2px;
     overflow-y: scroll;
 }
@@ -82,7 +79,7 @@
 }
 
 .bottom-row {
-    height: 100px;
+    height: 60px;
 }
 
 
