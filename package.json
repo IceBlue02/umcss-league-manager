@@ -1,8 +1,8 @@
 {
-  "name": "umcssleague",
-  "version": "0.7.0",
+  "name": "umcscleague",
+  "version": "0.7.1",
   "author": "Ewan Massey",
-  "description": "League Management Program for UoM Cue Sports Sociery",
+  "description": "League Management System for UoM Cue Sports Clue",
   "homepage": ".",
   "main": "build/electron/main.js",
   "license": "GPL-3.0-or-later",
@@ -37,23 +37,24 @@
   },
 
   "build": {
-    "productName": "UMCSS League",
+    "productName": "UMCSC League",
     "extends": null,
     "files": [
       "build/**/*"
     ],
-    "appId": "umcss-league",
+    "appId": "umcsc-league",
     "win": {
       "target": [
         "portable"
       ]
     },
     "portable": {
-      "artifactName": "pvmplayer_portable.exe"
+      "artifactName": "UMCSC League.exe"
     },
     "directories": {
       "output": "electron/output"
-    }
+    },
+    "icon": "icon.png"
   },
 
   "eslintConfig": {
