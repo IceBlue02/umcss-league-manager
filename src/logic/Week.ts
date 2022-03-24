@@ -1,16 +1,8 @@
 import Game from './Game';
 import Round from './Round';
-import {Player} from './Player';
+import {MembershipType, Player} from './Player';
 import PlayerList from './PlayerList';
 import RoundGenerator from './RoundGenerator';
-import { emitKeypressEvents } from 'readline';
-import { useTouchSensor } from 'react-beautiful-dnd';
-
-type rankingLL = {value: number, playerids: number[], next: rankingLL | null}
-
-interface IPlayerList {
-    players: Player[];
-}
 
 interface IWeek {
     date: Date;
@@ -43,27 +35,34 @@ class Week {
         
     }
 
+    /** 
+     * Restores a week from backup.
+     * 
+     * This is extremely messy currently, will be replaced with factory methods.
+     */
     static fromBackup(backup: IWeek): Week {
         var wk = new Week();
         Object.assign(wk, backup);
 
         var newPL = Object.assign(new PlayerList([]), wk.players)
         for (const p in newPL.players) {
-            Object.assign(new Player(-1, "", false, false, 0), p)
+            Object.assign(new Player(-1, "", MembershipType.NONE, false, 0), p)
         }
+
+        // This is a mess. TODO: Use factory methods instead.
 
         wk.rounds = []
         for (var i = 0; i < backup.rounds.length; i++) {
             let rnd = Object.assign(new Round(0), backup.rounds[i])
             rnd.games = [];
-            rnd.bye = Object.assign(new Player(-1, "", false, false, 0), backup.rounds[i].bye)
+            rnd.bye = Object.assign(new Player(-1, "", MembershipType.NONE, false, 0), backup.rounds[i].bye)
             for (var j = 0; j < backup.rounds[i].games.length; j++) {
                 let gme = new Game(
-                    [new Player(-1, "", false, false, 0), new Player(-1, "", false, false, 0)],
+                    [new Player(-1, "", MembershipType.NONE, false, 0), new Player(-1, "", MembershipType.NONE, false, 0)],
                     0, 0)
 
                 gme = Object.assign(gme, backup.rounds[i].games[j])
-                gme.players = [Object.assign(new Player(-1, "", false, false, 0), backup.rounds[i].games[j].players[0]), Object.assign(new Player(-1, "", false, false, 0), backup.rounds[i].games[j].players[1])]
+                gme.players = [Object.assign(new Player(-1, "", MembershipType.NONE, false, 0), backup.rounds[i].games[j].players[0]), Object.assign(new Player(-1, "", MembershipType.NONE, false, 0), backup.rounds[i].games[j].players[1])]
                 rnd.games.push(gme)
             }
             wk.rounds.push(rnd)
@@ -73,45 +72,31 @@ class Week {
         return wk
     }
 
-    
-
+    /**
+     * Generate the first round of the week, with games assigned completely randomly.
+     * @returns Round with randomly generated games
+     */
     generateInitialRound() {
-        var activePlayers = this.players.getActivePlayers();
-        var byePlayer: Player | undefined;
-        var newRound = new Round(this.nextround);
+        // Generate the initial round, with players randomly matched
+        var rg = new RoundGenerator(this);
+        const round = rg.generateRandom();
         this.nextround++;
 
-        let shuffled = activePlayers // Shuffles the playerlist randomly
-        .map(value => ({ value, sort: Math.random() }))
-        .sort((a, b) => a.sort - b.sort)
-        .map(({ value }) => value)
-
-        if (shuffled.length % 2 === 1) { // If odd number of players, assign the first player a bye
-            byePlayer = shuffled[0];
-            shuffled.shift();
-        }
-
-        var gameno = 1;
-        while (shuffled.length !== 0) { // Pair each player using the first 2 elements in the random list
-            let game = new Game([shuffled[0], shuffled[1]], newRound.number, gameno)
-            shuffled = shuffled.slice(2);
-            gameno++
-            newRound.addGame(game);
-        }
-
-        if (byePlayer) {
-            newRound.setBye(byePlayer);
-            this.players.setRoundPlayerInfo(byePlayer.id)
+        if (round.bye) {
+            this.players.setRoundPlayerInfo(round.bye.id)
         } else {
             this.players.setRoundPlayerInfo()
         }
 
-        newRound.games = RoundGenerator.orderGames(newRound.games);
-
-        return newRound
+        return round
     }
 
+    /**
+     * Generate the next rouund, using the current results to assign games @see RoundGenerator 
+     * @returns Round with generated games as per algorithm
+     */
     generateNextRound(): Round {
+        // Use a round generator to generate a new round
         var rg = new RoundGenerator(this);
         const round = rg.generate()
         this.nextround++;
@@ -125,6 +110,10 @@ class Week {
         return round
     }
 
+    /**
+     * Tests whether all currently known games are complete and updates this.finished accordingly.
+     * @returns true if all games are finished, otherwise false
+     */
     checkFinished() {
         for (const round of this.rounds) {
             for (const game of round.getGames()) {
@@ -138,6 +127,23 @@ class Week {
     }
 
 
+    /** 
+     * Calculates each player's ELO based on the games played.
+     * 
+     * The scoring system works as follows: 
+     * 
+     * Per game:
+     * 1 point for beating a player with a lower ELO than you
+     * 1 point + (ELO difference / 5) for beating a player with a higher ELO than you
+     * 
+     * 0.5 for taking a bye in a round
+     * 1 per week for any player who has played a game 
+     * 
+     * The function returns a string for writing to file, containing all scoring decisions.
+     * It also outputs to the console, if it is enabled.
+     * 
+     * @returns scoring log string, for saving to file
+     */
     calculateRankings(final?: boolean) {
         var currentElo: Map<number, number> = new Map<number, number>();    // Tracks changing ELO live during the round
         var frozenElo: Map<number, number>;                                 // Holds state of ELO before every round
@@ -162,7 +168,9 @@ class Week {
                 }
             }
 
-            frozenElo = new Map(currentElo); // Freeze the current ELO values before scoring the round
+            frozenElo = new Map(currentElo);
+            
+            // Freeze the current ELO values before scoring the round
             // (I don't think this matters, but I'm doing it this way out of safety)
 
             /*  Pass 2: Score the round as follows:
@@ -172,10 +180,10 @@ class Week {
             *   Bye: ELO += 0.5
             *   1 point per week for playing */
 
-            if (round.bye) {
+            if (round.bye) { // Handle the bye player (if present first)
                 const byeElo = currentElo.get(round.bye.id); // Give the bye player half a point
-                if (byeElo !== undefined) {    
-                    currentElo.set(round.bye.id, round.bye.startingelo + 0.5)
+                if (byeElo !== undefined) {  
+                    currentElo.set(round.bye.id, byeElo + 0.5)
                     console.log(`${round.bye.name} (${byeElo}) received 0.5 for a bye`)
                     scoringlog = scoringlog + `\n${round.bye.name} (${byeElo}) received 0.5 for a bye`
                 } else {
@@ -185,24 +193,29 @@ class Week {
 
             for (const game of round.games) {
                 if (game.scores[0] === game.scores[1] || game.scores[0] === null || game.scores[1] === null) {
-                    continue; // Game hasn't finished (or has been given the same score- shouldn't happen)
+                    continue; // Game hasn't finished (or has been given the same score- shouldn't happen, but ignore)
                 }
                 else {
+                    // Ensure both players have ELO values already
                     const p1Elo = frozenElo.get(game.players[0].id)
                     const p2Elo = frozenElo.get(game.players[1].id)
                     if (p1Elo === undefined || p2Elo === undefined) {
                         throw new Error("Player not in ELO ranking during ranking calculation")
                     }
-                    if (game.scores[0] > game.scores[1]) { // First player won
-                        let rankDiff = p2Elo - p1Elo
-                        rankDiff = rankDiff < 0 ? 0 : rankDiff
-                        currentElo.set(game.players[0].id, parseFloat((p1Elo + (rankDiff / 5) + 1).toPrecision(5)))
+
+                    if (game.scores[0] > game.scores[1]) { // First player (p1) won
+                        let rankDiff = p2Elo - p1Elo                // Calculate difference
+                        rankDiff = rankDiff < 0 ? 0 : rankDiff      // Make difference zero if p1Elo is greater
+                        currentElo.set(game.players[0].id, parseFloat((p1Elo + (rankDiff / 5) + 1).toPrecision(5))) // Add and round to 5
+                        // Print and add to scoring log
                         console.log(`${game.players[0].name} (${p1Elo}) beat ${game.players[1].name} (${p2Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`)
                         scoringlog = scoringlog + `\n${game.players[0].name} (${p1Elo}) beat ${game.players[1].name} (${p2Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`
-                    } else {
+                    } 
+                    else {                                // Second player (p2) won
                         let rankDiff = p1Elo - p2Elo
                         rankDiff = rankDiff < 0 ? 0 : rankDiff
                         currentElo.set(game.players[1].id, parseFloat((p2Elo + (rankDiff / 5) + 1).toPrecision(5)))
+
                         console.log(`${game.players[1].name} (${p2Elo}) beat ${game.players[0].name} (${p1Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`)
                         scoringlog = scoringlog + `\n${game.players[1].name} (${p2Elo}) beat ${game.players[0].name} (${p1Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`
                     }
@@ -211,6 +224,7 @@ class Week {
             }
         }
 
+        // Add one to each player for participating in the week
         for (const [playerid, elo] of currentElo.entries()) {
             let pl = this.players.getPlayerFromID(playerid)
             pl.currentelo = elo + 1; // Add 1 for participating in week
@@ -221,16 +235,43 @@ class Week {
         }
         if (final) {
             window.filesys.savePlayerFile(this.players.getJSON())
-
         }
-        window.filesys.saveScoringlog(scoringlog)
+        return scoringlog;
     }
 
+    /**
+     * Returns a JSON representation of all data of the week, for backup
+     * @returns JSON string representation of the week.
+     */
     toJSONBackup() {
         return JSON.stringify(this);
     }
 
+    /**
+     * Returns a JSON representation of all data of the week, for backup
+     * @returns JSON string representation of the week.
+     */
+    getCSVRankings(): String {
+        var csvdata = "Player,Points,Change From Last Week\n";
+        var players = this.players.getPlayers();
+
+        players.sort((a, b) => (a.currentelo > b.currentelo) ? -1 : 1);
+
+        for (const p of players) {
+            if (p.currentelo !== 0) {
+                let rankstr = p.name + "," + 
+                    (Math.round((p.currentelo + Number.EPSILON) * 10000) / 10000).toString() + ",+" + 
+                    (Math.round((p.elochange + Number.EPSILON) * 10000) / 10000).toString() + '\n'
+
+                csvdata = csvdata + rankstr;
+            }
+        }
+
+        return csvdata
+    }
+
     getJSON() {
+        // Filters out properties which shouldn't be saved.
         const replacer = (key: string, value: any) => {
             if (["currentelo", "inrounds", "byes", "playingState"].includes(key)) {
                 return undefined;

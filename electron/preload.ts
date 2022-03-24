@@ -11,7 +11,7 @@ const { ipcRenderer, contextBridge } = require('electron');
 contextBridge.exposeInMainWorld('filesys', {
     readFile: (path: string) => ipcRenderer.invoke('readFile', path),
     saveFile: (jsonfile: string) => ipcRenderer.invoke('saveFile', jsonfile),
-    saveScoringlog: (file: string) => ipcRenderer.invoke('saveScoringlog', file),
+    saveScoringLog: (file: string) => ipcRenderer.invoke('saveScoringlog', file),
     saveCSVFile: (file: string) => ipcRenderer.invoke('saveCSVFile', file),
     saveBackup: (jsonfile: string, filename: string) => ipcRenderer.invoke('saveBackup', jsonfile, filename),
     loadBackup: () => ipcRenderer.invoke('loadBackup'),

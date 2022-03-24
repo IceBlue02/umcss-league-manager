@@ -1,8 +1,7 @@
 import React from 'react';
-import {useNavigate} from 'react-router-dom';
 import MainWeekView from "./MainWeekView"
 import MenuBar from "./MenuBar"
-import {Week, Round} from "../logic/Week"
+import {Week} from "../logic/Week"
 import PlayerSelect from "./PlayerSelect"
 import {getBackupJSON} from "../logic/FileHandler"
 import EditPlayerBox from "./EditPlayerBox"
@@ -171,9 +170,11 @@ class Main extends React.Component<MainProps, MainState> {
 
     onWeekEnd() {
         this.backup()
-        //TODO: Week ending logic
-        this.state.week.calculateRankings(true);
-        this.state.week.getJSON();
+        const scorelog = this.state.week.calculateRankings(true);
+        window.filesys.saveScoringLog(scorelog);
+
+        const csvdata = this.state.week.getCSVRankings();
+        window.filesys.saveCSVFile(csvdata);
     }
 
     

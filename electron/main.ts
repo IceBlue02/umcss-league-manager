@@ -68,7 +68,7 @@ ipcMain.handle("saveScoringlog", (event, file: string) => {
 
 ipcMain.handle("saveCSVFile", (event, file: string) => {
     const filepath = dialog.showSaveDialogSync(win, {
-        title: "Save Scoring File",
+        title: "Save Rankings",
         defaultPath: app.getPath("documents"),
         filters: [{name: "CSV Data", extensions: ["csv"]}]
     })
@@ -155,6 +155,7 @@ app.whenReady().then(() => {
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
+      win.webContents.openDevTools();
     }
   });
 
