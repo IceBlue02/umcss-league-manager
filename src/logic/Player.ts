@@ -8,7 +8,7 @@ interface IPlayer {
     id: number;
     name: string;
     startingelo: number;
-    member: boolean;
+    member: MembershipType;
     ap3: boolean;
 }
 
@@ -21,17 +21,27 @@ enum PlayingState {
     NOTPLAYING
 }
 
+enum MembershipType {
+    NONE = "none",
+    MEMBER = "member",
+    ALUMNI = "alumni"
+}
+
+
 /** 
  * Represents a player.
  */
 class Player {
     id: number;
     name: string;
-    member: boolean;
+    member: MembershipType;
     ap3: boolean;
+    paid: boolean;
+
     startingelo: number;
     currentelo: number;
     elochange: number = 0;
+
     inrounds: boolean[];
     byes: (boolean | null)[];
     seed: number;
@@ -43,11 +53,13 @@ class Player {
      * 
      * @param id - Player ID, unique, remains constant once assigned
      * @param name - The name of the player
+     * @param member - The membership type of a player (either none, member, or alumni)
      * @param startingelo - The players starting ELO at the beginning of the night
      * @param currentround - The current round. If later in the week, inround and null need to
      * be adjusted to ensure they are consistant with all other players
      */
-    constructor(id: number, name: string, member: boolean, ap3: boolean, startingelo: number, currentround?: number) {
+
+    constructor(id: number, name: string, member: MembershipType, ap3: boolean, startingelo: number, currentround?: number) {
     
         this.id = id;
         this.name = name;
@@ -56,6 +68,8 @@ class Player {
         this.elochange = 0;
         this.ap3 = ap3;
         this.member = member;
+        this.paid = false;
+
         this.seed = Math.floor(Math.random() * 1000)// Used to order games properly
         this.inrounds = [];
         this.byes = [];
@@ -77,9 +91,9 @@ class Player {
      */
     static fromJSON(jsonObj: IPlayer, currentround?: number): Player {
         if (typeof(currentround) != "undefined") {
-            return new Player(jsonObj.id, jsonObj.name, jsonObj.member, jsonObj.ap3, jsonObj.startingelo, currentround);
+            return new Player(jsonObj.id, jsonObj.name, jsonObj.member as MembershipType, jsonObj.ap3, jsonObj.startingelo, currentround);
         } else {
-            return new Player(jsonObj.id, jsonObj.name, jsonObj.member, jsonObj.ap3, jsonObj.startingelo);
+            return new Player(jsonObj.id, jsonObj.name, jsonObj.member as MembershipType, jsonObj.ap3, jsonObj.startingelo);
         }
     }
 }
@@ -125,5 +139,5 @@ class PlayerList {
     }
 }
 
-export {Player, PlayingState}
+export {Player, PlayingState, MembershipType}
 export type {IPlayer}

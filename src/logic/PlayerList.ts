@@ -1,4 +1,4 @@
-import {IPlayer, Player, PlayingState} from "./Player";
+import {IPlayer, Player, PlayingState, MembershipType} from "./Player";
 
 /**
  * Holds all players currently known to the application
@@ -42,7 +42,7 @@ class PlayerList {
         while (id === -1 || this.isIDAssigned(id)) {
             id = Math.floor(Math.random() * 99999999);
         }
-        return new Player(id, "", false, false, 0);
+        return new Player(id, "", MembershipType.NONE, false, 0);
     }
 
     isIDAssigned(id: number) {
