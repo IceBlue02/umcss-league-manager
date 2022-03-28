@@ -48,7 +48,7 @@ class RoundGenerator {
         if (shuffled.length % 2 === 1) { // If odd number of players, assign the first player a bye
             let byePlayerID = this.selectBye() 
             newRound.bye = this.week.players.getPlayerFromID(byePlayerID);
-            players = players.filter(p => p.id !== byePlayerID)
+            shuffled = shuffled.filter(p => p.id !== byePlayerID)
         }
 
         // Pair the players in consecutive pairs, based on the randomly ordered list, leading to a random set of games
