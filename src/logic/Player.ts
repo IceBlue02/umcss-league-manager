@@ -21,6 +21,9 @@ enum PlayingState {
     NOTPLAYING
 }
 
+/**
+ * Represents the membership a member has
+ */
 enum MembershipType {
     NONE = "none",
     MEMBER = "member",
@@ -66,14 +69,17 @@ class Player {
         this.startingelo = startingelo;
         this.currentelo = this.startingelo;
         this.elochange = 0;
+
         this.ap3 = ap3;
         this.member = member;
         this.paid = false;
 
-        this.seed = Math.floor(Math.random() * 1000)// Used to order games properly
+        this.seed = Math.floor(Math.random() * 1000) // Randomly generated per week, used for game ordering
+
         this.inrounds = [];
         this.byes = [];
 
+        // If currentround is specified, ensure inrounds and byes are set correctly
         if (currentround != null) {
             for (var i = 0; i < currentround; i++) {
                 this.inrounds.push(false);
@@ -95,47 +101,6 @@ class Player {
         } else {
             return new Player(jsonObj.id, jsonObj.name, jsonObj.member as MembershipType, jsonObj.ap3, jsonObj.startingelo);
         }
-    }
-}
-
-/**
- * Holds all players currently known to the application
- */
-class PlayerList {
-    players: Player[];
-    
-    constructor(jsonData: IPlayer[]) {
-        console.log(jsonData);
-        this.players = [];
-        for (const jsonObj of jsonData) {
-            this.players.push(
-                Player.fromJSON(jsonObj)
-            );
-        }
-    }
-
-    /**
-     * Returns the array of player opjects
-     * 
-     * @returns Array of all players in the application
-     */
-    getPlayers(): Player[] {
-        return this.players;
-    }
-
-    /**
-     * Gets the player correstponding to the given ID
-     * 
-     * @param id The ID of the player to search for
-     * @returns Player correstponding to the ID, or null if the ID is not found.
-     */
-    getPlayerFromID(id: number): Player {
-        for (const pl of this.players) {
-            if (pl.id === id) {
-                return pl;
-            }
-        }
-        throw new Error(`Player ${id} not found`);
     }
 }
 

@@ -7,15 +7,22 @@ class PlayerList {
     players: Player[];
     
 
-    // TODO- Look at this
-    constructor(jsonData: IPlayer[]) {
-        console.log(jsonData);
+    /**
+     * Instantiates a new PlayerList.
+     * 
+     * Optionally, a JSON 
+     * 
+     * @param [jsonData] - JSON data to load into the player list. 
+     */
+    constructor(jsonData?: IPlayer[]) {
         this.players = [];
-        for (const jsonObj of jsonData) {
-            this.players.push(
-                Player.fromJSON(jsonObj)
-            );
-        }
+        if (jsonData) {
+            for (const jsonObj of jsonData) {
+                this.players.push(
+                    Player.fromJSON(jsonObj)
+                );
+            }
+        } 
     }
 
     /**
@@ -28,15 +35,10 @@ class PlayerList {
     }
 
     /**
-     * Returns the player at a given index in the players array.
+     * Generates a new blank player object, with a unique ID.
      * 
-     * @param index - Index of the player to return
-     * @returns Player correstponding to index
+     * @returns New player object, with ID set
      */
-    getPlayerFromIndex(indx: number): Player {
-        return this.players[indx];
-    }
-
     getNewPlayer(): Player {
         var id = -1;
         while (id === -1 || this.isIDAssigned(id)) {
@@ -45,24 +47,53 @@ class PlayerList {
         return new Player(id, "", MembershipType.NONE, false, 0);
     }
 
+    /**
+     * Tests whether a given ID has already been assigned or not.
+     * @param id ID to test (0-99999999)
+     * @returns True if the ID is assigned, otherwise false
+     */
     isIDAssigned(id: number) {
         for (const pl of this.players) {
-            if (pl.id == id) {
+            if (pl.id === id) {
                 return true;
             }
         }
         return false;
     }
+
+    /**
+     * Returns the player at a given index in the players array.
+     * 
+     * Throws an error if the index is out of bounds.
+     * 
+     * @param index - Index of the player to return
+     * @returns Player correstponding to index
+     */
+     getPlayerFromIndex(indx: number): Player | null {
+        if (0 <= indx && indx < this.players.length) {
+            return this.players[indx];
+        } else {
+            throw new Error(`Index ${indx} is out of range when `)
+        }
+    }
     
+    /**
+     * Gets the player correstponding to the given index in the players list.
+     * 
+     * Returns null if the index is out of range.
+     * 
+     * @param id The ID of the player to search for
+     * @returns Player correstponding to the ID, or null if the ID is not found.
+     */
     getIndexFromID(id: number): number {
         var indx = 0;
         for (const pl of this.players) {
-            if (pl.id == id) {
+            if (pl.id === id) {
                 return indx;
             }
             indx++;
         }
-        throw new Error("Player ${id} not found");
+        throw new Error(`Player ${id} not found`);
     }
 
     /**
@@ -110,6 +141,11 @@ class PlayerList {
         return players;
     }
 
+    /**
+     * Gets all players with a matching state to the state given
+     * @param state Playing state to return matches for
+     * @returns Array of players with matching player state
+     */
     getPlayersWithState(state: PlayingState): Player[] {
         var players: Player[] = [];
         for (const pl of this.players) {
@@ -125,8 +161,10 @@ class PlayerList {
      * 
      * When a new round is made, the inrounds and byes fields of each player is updated: 
      * inrounds: True if the player is assigned is active, otherwise False
-     * byes: True if the player is active and is assigned a bye, False if they are active
-     * and not assigned a bye, or null if they are not active.
+     * byes: 
+     *      true if the player is taking a bye
+     *      false if the player is active, not taking a bye, but someone else is
+     *      null otherwise (not playing, or no bye being taken)
      * 
      * This method is called when a round is created to update all players
      * 
@@ -137,11 +175,13 @@ class PlayerList {
     setRoundPlayerInfo(byeID?: number) { 
         for (const pl of this.players) {
             if (pl.playingState === PlayingState.AWAY || pl.playingState === PlayingState.NOTPLAYING) {
+                // Player not in this round
                 pl.inrounds.push(false);
                 pl.byes.push(null);
             } else {
+                // Player in this round
                 pl.inrounds.push(true);
-                if (typeof byeID != undefined) {
+                if (typeof byeID != "undefined") {
                     if (byeID === pl.id) {
                         pl.byes.push(true); // taking a bye
                     } else {
@@ -154,6 +194,14 @@ class PlayerList {
         }
     }
 
+    /**
+     * Returns a JSON representation of the players, for saving to players.json.
+     * 
+     * Filters out values which should not be saved and change between nights.
+     * 
+     * @param finaliseranks True if calculated ELO values should be saved, otherwise false
+     * @returns JSON string representation of players.
+     */
     getJSON(finaliseranks?: boolean) {
         if (finaliseranks) {
             for (var pl of this.players) {
