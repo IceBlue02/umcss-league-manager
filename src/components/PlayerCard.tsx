@@ -4,7 +4,6 @@ import {Player, MembershipType, PlayingState} from "../logic/Player"
 import {Draggable} from "react-beautiful-dnd"
 
 import "../styles/PlayerCard.css"
-import { throws } from 'assert';
 
 
 
@@ -49,12 +48,12 @@ class PlayerCard extends React.Component<PlayerCardProps> {
             this.props.onEdit(this.props.player.id);
         }
         if (event.detail === 2) {
-            if (this.props.player.playingState == PlayingState.PLAYING) {
+            if (this.props.player.playingState === PlayingState.PLAYING) {
                 // Double click to move
-            } else if (this.props.player.playingState == PlayingState.NOTPLAYING) {
+            } else if (this.props.player.playingState === PlayingState.NOTPLAYING) {
             }
         }
-        if (event.detail == 3) {
+        if (event.detail === 3) {
             event.stopPropagation();
         }
     }

@@ -2,7 +2,6 @@ import React from 'react';
 import {Week} from "../logic/Week"
 import RoundColumn from "./RoundColumn"
 import '../styles/MainWeekView.css';
-import { runInThisContext } from 'vm';
 
 type MainWeekViewProps = {
     week: Week

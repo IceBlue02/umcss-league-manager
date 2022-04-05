@@ -2,7 +2,7 @@ import React from 'react';
 import PlayerList from "../logic/PlayerList";
 import {PlayingState} from "../logic/Player"
 import {Link, Navigate} from "react-router-dom"
-import {DragDropContext, Droppable, Draggable, DropResult} from "react-beautiful-dnd"
+import {DragDropContext, Droppable, DropResult} from "react-beautiful-dnd"
 
 import PlayerCard from "./PlayerCard"
 
@@ -111,11 +111,11 @@ class PlayerSelect extends React.Component<PlayerSelectProps, PlayerSelectState>
         }
 
         if (result.destination.droppableId === "playing") {
-            this.props.callbacks.playerStateChanged(result.draggableId, PlayingState.PLAYING);
+            this.props.callbacks.playerStateChanged(plid, PlayingState.PLAYING);
         } else if (result.destination.droppableId === "not-playing") {
-            this.props.callbacks.playerStateChanged(result.draggableId, PlayingState.NOTPLAYING);
+            this.props.callbacks.playerStateChanged(plid, PlayingState.NOTPLAYING);
         } else if (result.destination.droppableId === "away") {
-            this.props.callbacks.playerStateChanged(result.draggableId, PlayingState.AWAY);
+            this.props.callbacks.playerStateChanged(plid, PlayingState.AWAY);
         }
         this.setNewOrder(parseInt(result.draggableId), result.destination.index, result.destination.droppableId)
     }

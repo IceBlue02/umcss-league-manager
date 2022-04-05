@@ -1,14 +1,7 @@
 import React from 'react';
 import "../styles/MenuBar.css"
 import "./PlayerSelect"
-
-
-import {
-    HashRouter as Router,
-    Route, 
-    Link
-} from "react-router-dom"
-import { useTouchSensor } from 'react-beautiful-dnd';
+import {Link} from "react-router-dom"
 
 type MenuBarProps = {
     callbacks: {

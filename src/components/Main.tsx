@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-computed-key */
 import React from 'react';
 import MainWeekView from "./MainWeekView"
 import MenuBar from "./MenuBar"
@@ -10,7 +11,6 @@ import {Player, PlayingState} from "../logic/Player"
 import update from "immutability-helper"
 
 import {
-    HashRouter as Router,
     Route, 
     Routes
 } from "react-router-dom"

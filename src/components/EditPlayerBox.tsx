@@ -1,6 +1,5 @@
 import React from 'react';
 import {Player, MembershipType} from "../logic/Player"
-import PlayerList from "../logic/PlayerList"
 import {useLocation, useNavigate} from "react-router-dom"
 import "../styles/PlayerEdit.css"
 
@@ -34,7 +33,6 @@ function EditPlayerBox (props: EditPlayerBoxProps) {
 
     const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
         var id: number;
 
         var elements = (event.currentTarget as FormElements)
@@ -52,10 +50,9 @@ function EditPlayerBox (props: EditPlayerBoxProps) {
         }
     
         var startingelotxt = elements.elo.value
-        if (startingelotxt === null) {
-            var startingelo = 0;
-        } else {
-            var startingelo = parseFloat(parseFloat(startingelotxt).toPrecision(5));
+        var startingelo = 0;
+        if (startingelotxt !== null) {
+            startingelo = parseFloat(parseFloat(startingelotxt).toPrecision(5));
         }
     
         const membership = elements.member.value
@@ -98,9 +95,9 @@ function EditPlayerBox (props: EditPlayerBoxProps) {
                     </div>
                     <div className="inputholder">
                         <select name="member" id="member">
-                            <option selected={player.member == MembershipType.NONE} value="none">None</option>
-                            <option selected={player.member == MembershipType.MEMBER} value="member">Member</option>
-                            <option selected={player.member == MembershipType.ALUMNI} value="alumni">Alumni</option>
+                            <option selected={player.member === MembershipType.NONE} value="none">None</option>
+                            <option selected={player.member === MembershipType.MEMBER} value="member">Member</option>
+                            <option selected={player.member === MembershipType.ALUMNI} value="alumni">Alumni</option>
                         </select>
                     </div>
                     <div className="inputholder">
