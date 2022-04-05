@@ -15,9 +15,7 @@ declare global {
     }
 }
 
-const filepath = "/Users/ewan/git/umcss-league-manager/src/data/players.json"
-
-getPlayerJSON(filepath)
+getPlayerJSON()
 .then(jsonData => {
     if (jsonData !== null) {
         return new PlayerList(jsonData)
@@ -28,9 +26,7 @@ getPlayerJSON(filepath)
 
 
 function renderMain(pl: PlayerList) {
-    var week = new Week(pl);
-    var players = pl.getPlayers();
-    
+    var week = new Week(pl); 
 
     ReactDOM.render(
         <React.StrictMode>
