@@ -1,7 +1,7 @@
 import {IPlayer} from './Player';
 import {IWeek} from "./Week";
 
-async function getPlayerJSON(filepath: string): Promise<IPlayer[] | null> {
+async function getPlayerJSON(): Promise<IPlayer[] | null> {
     var jsonData: BufferSource | null = null;
 
     try {
@@ -10,7 +10,7 @@ async function getPlayerJSON(filepath: string): Promise<IPlayer[] | null> {
     } 
     catch (e) {
         if (e instanceof TypeError) {
-            console.log("Error fetching JSON file: " + filepath);
+            console.log("Error fetching JSON file");
             console.log(e.message);
         } else {
             throw e

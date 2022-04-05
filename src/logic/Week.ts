@@ -2,7 +2,7 @@ import Game from './Game';
 import Round from './Round';
 import {MembershipType, Player} from './Player';
 import PlayerList from './PlayerList';
-import RoundGenerator from './RoundGenerator';
+import {RankedRoundGenerator, RandomRoundGenerator} from './RoundGenerator';
 
 interface IWeek {
     date: Date;
@@ -38,7 +38,8 @@ class Week {
     /** 
      * Restores a week from backup.
      * 
-     * This is extremely messy currently, will be replaced with factory methods.
+     * This is an extremely messy and quick solution, which will eventually be replaced
+     * with properly defined interfaces and factory methods. For now, it works (just about).
      */
     static fromBackup(backup: IWeek): Week {
         var wk = new Week();
@@ -48,8 +49,6 @@ class Week {
         for (const p in newPL.players) {
             Object.assign(new Player(-1, "", MembershipType.NONE, false, 0), p)
         }
-
-        // This is a mess. TODO: Use factory methods instead.
 
         wk.rounds = []
         for (var i = 0; i < backup.rounds.length; i++) {
@@ -78,8 +77,8 @@ class Week {
      */
     generateInitialRound() {
         // Generate the initial round, with players randomly matched
-        var rg = new RoundGenerator(this);
-        const round = rg.generateRandom();
+        var rg = new RandomRoundGenerator(this);
+        const round = rg.generate();
         this.nextround++;
 
         if (round.bye) {
@@ -97,7 +96,7 @@ class Week {
      */
     generateNextRound(): Round {
         // Use a round generator to generate a new round
-        var rg = new RoundGenerator(this);
+        var rg = new RankedRoundGenerator(this);
         const round = rg.generate()
         this.nextround++;
 
@@ -270,6 +269,10 @@ class Week {
         return csvdata
     }
 
+    /**
+     * Returns a JSON representation of relevant data of the week, for output at end of week
+     * @returns JSON string representation of the week.
+     */
     getJSON() {
         // Filters out properties which shouldn't be saved.
         const replacer = (key: string, value: any) => {
