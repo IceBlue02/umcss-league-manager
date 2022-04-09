@@ -1,197 +1,58 @@
-React-TypeScript-Electron sample with Create React App and Electron Builder
-===========================================================================
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app) with `--template typescript`option.
+A league management application for the [University of Manchester Cue Sports Club](https://www.sport.manchester.ac.uk/sport-and-activity/sport-a-to-z/cue-sports/), built in TypeScript, using Electron.js and React.
 
-On the top of it, the following features have been added with realatively small changes:
+Based on the [original version](https://github.com/IceBlue02/Cue-Sports-League-Manager/), originally written by Ashley Smith and Jonathan Mulvey, and improved by Ewan Massey
 
-* TypeScript supports for Electron main process source code
-* Hot-relaod support for Electron app
-* Electron Bulder support
+**Want to use this?** Even within our club, this software is still considered beta and under active development, and we aren't ready to put out public releases just yet. I'd recommend getting in contact with me ([Email](mailto:ewanmassey1@gmail.com) or [Twitter](https://twitter.com/ewanmassey14)) and I'll help you get set up.
 
-## Available Scripts in addition to the existing ones
+**Want to contribute?** Awesome! See the contributing section below.
 
-### `npm run electron:dev`
+Licenced under the GNU General Public License 3.0.
 
-Runs the Electron app in the development mode.
+## Features
+* Custom Swiss-esque matchmaking algorithm
+* Performance weighted scoring system, with CSV scoring export
+* Automatic and fair allocation of bye rounds where necessary
+* Basic player management 
+* Automatic backup
 
-The Electron app will reload if you make edits in the `electron` directory.<br>
-You will also see any lint errors in the console.
+### Matchmaking
+Our matchmaking aim is to place players with simular win loss records against each other, on a night by night basis (previous performance does not affect the matchmaking, but does affect scoring- see below). We aim to always avoid players replaying any earlier than necessary, even at the expense of heavily 'unfair' games, but the algorithm can be customised to change when to prefer replaying over differing games. This works well at our league nights, giving a good variety of opponent each week and not penalising 'off weeks' whilst ensuring players are getting competitive games every week.
 
-### `npm run electron:build`
+Technically, a weighting function is applied to each possible matchup based on the difference in record, and whether opponents have played already. A greedy algorithm then selects the best match repeatedly (breaking ties randomly), until the problem has been reduced enough (currently to the last 8 players) for an enumeration algorithm to take over, selecting the best possible set of games. 
 
-Builds the Electron app package for production to the `dist` folder.
+Byes are assigned where necessary (odd number of players in the round). The algorithm assigns the bye to the player who has played the most games since taking a bye, breaking a tie randomly.
 
-Your Electron app is ready to be distributed!
+### Scoring
 
-## Project directory structure
+This scoring system was originally devised by Ashley Smith, and has served us well, with me making small tweaks along the way. This point system persists throughout the league nights every week during the semester and is used to decide the league standings.
 
-```bash
-my-app/
-├── package.json
-│
-## render process
-├── tsconfig.json
-├── public/
-├── src/
-│
-## main process
-├── electron/
-│   ├── main.ts
-│   └── tsconfig.json
-│
-## build output
-├── build/
-│   ├── index.html
-│   ├── static/
-│   │   ├── css/
-│   │   └── js/
-│   │
-│   └── electron/
-│      └── main.js
-│
-## distribution packges
-└── dist/
-    ├── mac/
-    │   └── my-app.app
-    └── my-app-0.1.0.dmg
-```
+**Per meeting:** 1 point for attending an evening.
+**Winning against an opponent with less points:** 1 point.
+**Winning against an opponent with more points:** 1 + (1/5 point difference between opponents) points.
+**Losing:** No change.
+ **For taking a bye:** 1/2 point.
 
-## Do it yourself from scratch
+The system aims to promote meeting attendance, but also allow good players who can't attend every week, or start later in the semester, to quickly rise up the league table. The bye point aims to avoid too much disadvantage for being assigned a bye.
 
-### Generate a React project and install npm dependencies
+## Technologies
 
-```bash
-create-react-app my-app --template typescript
-cd my-app
-yarn add @types/electron-devtools-installer electron-devtools-installer electron-is-dev electron-reload
-yarn add -D concurrently electron electron-builder wait-on cross-env
-```
+The application is based on [Electron](). Frontend is handled by [React](), with the (awesome) [React Beautiful DnD](https://github.com/atlassian/react-beautiful-dnd) used in addition.
 
-### Make Electron main process source file
+The source is mainly written in TypeScript.
 
-#### electron/tsconfig.json
+This was my first time using any of these technologies, so I used this great [starter](https://github.com/yhirose/react-typescript-electron-sample-with-create-react-app-and-electron-builder) by yhirose.
 
-```json
-{
-  "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "sourceMap": true,
-    "strict": true,
-    "outDir": "../build", // Output transpiled files to build/electron/
-    "rootDir": "../",
-    "noEmitOnError": true,
-    "typeRoots": [
-      "node_modules/@types"
-    ]
-  }
-}
-```
+## Running and Building
+You'll need [node.js](https://nodejs.org/en/) and [npm](https://www.npmjs.com/) installed.
 
-#### electron/main.ts
+**Run the application (development only):** `npm run electron:dev`
+**Build executables:** `npm run electron:build`
 
-```ts
-import { app, BrowserWindow } from 'electron';
-import * as path from 'path';
-import * as isDev from 'electron-is-dev';
-import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
+Check out [Electron Builder](https://www.electron.build/) for more details on how to customise the build process.
+## Contributing
+This application is currently developed pretty much solely by myself to our requirements at UoMCSC. Later down the line, we envisage a more polished, customisable version that can be used by a variety of pool clubs and leagues.
 
-let win: BrowserWindow | null = null;
+If you'd like to contribute, I'd ask you message me first (to avoid duplication of work etc), or open an issue on the issue tracker. Likewise, if you find bugs or have suggestions, please open an issue.
 
-function createWindow() {
-  win = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      nodeIntegration: true
-    }
-  })
-
-  if (isDev) {
-    win.loadURL('http://localhost:3000/index.html');
-  } else {
-    // 'build/index.html'
-    win.loadURL(`file://${__dirname}/../index.html`);
-  }
-
-  win.on('closed', () => win = null);
-
-  // Hot Reloading
-  if (isDev) {
-    // 'node_modules/.bin/electronPath'
-    require('electron-reload')(__dirname, {
-      electron: path.join(__dirname, '..', '..', 'node_modules', '.bin', 'electron'),
-      forceHardReset: true,
-      hardResetMethod: 'exit'
-    });
-  }
-
-  // DevTools
-  installExtension(REACT_DEVELOPER_TOOLS)
-    .then((name) => console.log(`Added Extension:  ${name}`))
-    .catch((err) => console.log('An error occurred: ', err));
-
-  if (isDev) {
-    win.webContents.openDevTools();
-  }
-}
-
-app.on('ready', createWindow);
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
-
-app.on('activate', () => {
-  if (win === null) {
-    createWindow();
-  }
-});
-```
-
-### Adjust package.json
-
-#### Add properties for Electron
-
-```json
-  "homepage": ".", # see https://create-react-app.dev/docs/deployment#serving-the-same-build-from-different-paths
-  "main": "build/electron/main.js",
-```
-
-#### Add properties for Electron Builder
-
-```json
-  "author": "Your Name",
-  "description": "React-TypeScript-Electron sample with Create React App and Electron Builder",
-  ...
-  "build": {
-    "extends": null, # see https://github.com/electron-userland/electron-builder/issues/2030#issuecomment-386720420
-    "files": [
-      "build/**/*"
-    ],
-    "directories": {
-      "buildResources": "assets" # change the resource directory from 'build' to 'assets'
-    }
-  },
-```
-
-#### Add scripts
-
-```json
-  "scripts": {
-    "postinstall": "electron-builder install-app-deps",
-    "electron:dev": "concurrently \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
-    "electron:build": "yarn build && tsc -p electron && electron-builder",
-```
-
-## Many thanks to the following articles!
-
-- [⚡️ From React to an Electron app ready for production](https://medium.com/@kitze/%EF%B8%8F-from-react-to-an-electron-app-ready-for-production-a0468ecb1da3)
-- [How to build an Electron app using Create React App and Electron Builder](https://www.codementor.io/randyfindley/how-to-build-an-electron-app-using-create-react-app-and-electron-builder-ss1k0sfer)
-- [Application entry file reset to default (react-cra detected and config changed incorrectly)](https://github.com/electron-userland/electron-builder/issues/2030)
-- [Serving the Same Build from Different Paths](https://create-react-app.dev/docs/deployment#serving-the-same-build-from-different-paths)
-
-## 
+In terms of features, my next priorities are manually creating/editing/deleting games, as well as general UX polish.
