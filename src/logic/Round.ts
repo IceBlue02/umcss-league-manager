@@ -22,6 +22,16 @@ class Round {
         this.games.push(game);
     }
 
+    getHighestGameNo() {
+        var highest = 0;
+        for (const g of this.games) {
+            if (g.gameno > highest) {
+                highest = g.gameno;
+            }
+        }
+        return highest
+    }
+
     createGame(players: [Player, Player]) {
         this.games.push(new Game(players, this.number, this.games.length+1));
     }
