@@ -6,14 +6,15 @@ import {Week} from "../logic/Week"
 import PlayerSelect from "./PlayerSelect"
 import {getBackupJSON} from "../logic/FileHandler"
 import EditPlayerBox from "./EditPlayerBox"
-
 import {Player, PlayingState} from "../logic/Player"
+import Game from "../logic/Game"
 import update from "immutability-helper"
 
 import {
     Route, 
     Routes
 } from "react-router-dom"
+import { useTouchSensor } from 'react-beautiful-dnd';
 
 
 type MainProps = {
@@ -42,6 +43,7 @@ class Main extends React.Component<MainProps, MainState> {
         this.onWeekEnd = this.onWeekEnd.bind(this);
         this.restoreFromBackup = this.restoreFromBackup.bind(this);
         this.playerChanged = this.playerChanged.bind(this);
+        this.addGame = this.addGame.bind(this);
     }
 
     restoreFromBackup() {
@@ -107,6 +109,38 @@ class Main extends React.Component<MainProps, MainState> {
                                     scores: {
                                         [1]: {$set: lowerScore}},
             }}}}}}), () => {this.backup()})
+        }
+    }
+
+    addGame(roundno: number, p1: Player, p2: Player) {
+
+        const round = this.state.week.rounds[roundno-1]
+        const gamenum = round.getHighestGameNo() + 1;
+        var game = new Game([p1, p2], roundno, gamenum)
+
+        if (round.bye !== null && (round.bye.id === p1.id || round.bye.id === p2.id)) {
+            console.log("removing bye")
+            this.setState(update(this.state, {
+                week: {
+                    rounds: {
+                        [roundno-1]: {
+                            bye: {
+                                $set: null
+                            },
+                            games: {
+                                $push: [game]
+                            }
+            }}}}), () => {this.backup()}) 
+            console.log(this.state.week.rounds[roundno-1].bye)
+        } else {
+            this.setState(update(this.state, {
+                week: {
+                    rounds: {
+                        [roundno-1]: {
+                            games: {
+                                $push: [game]
+                            }
+            }}}}), () => {this.backup()}) 
         }
     }
 
@@ -182,7 +216,8 @@ class Main extends React.Component<MainProps, MainState> {
                     <Route path="/" element={
                         <div className="wrapper">
                             <MenuBar callbacks= {{generateRound: this.generateRound, weekEnd: this.onWeekEnd, backupLoad: this.restoreFromBackup}} />
-                            <MainWeekView week={this.state.week} callbacks={{scoreChanged: this.changeScore}}/>
+                            <MainWeekView week={this.state.week} callbacks={{scoreChanged: this.changeScore, addGame: this.addGame}}
+                            players={this.state.week.players}/>
                         </div>
                     }/>
                     <Route path="/players" element={<PlayerSelect players={this.state.week.players} callbacks={{playerStateChanged: this.changePlayingState}}/>}/>

@@ -1,13 +1,16 @@
 import React from 'react';
 import {Week} from "../logic/Week"
 import RoundColumn from "./RoundColumn"
+import PlayerList from "../logic/PlayerList"
 import '../styles/MainWeekView.css';
 
 type MainWeekViewProps = {
     week: Week
     callbacks: {
         scoreChanged: Function
+        addGame: Function
     }
+    players: PlayerList;
 }
 
 type MainWeekViewState = {
@@ -32,16 +35,22 @@ class MainWeekView extends React.Component<MainWeekViewProps, MainWeekViewState>
                     active={this.state.activeCard[1]}
                     callbacks={{
                         scoreChanged: this.props.callbacks.scoreChanged, 
+                        addGame: this.props.callbacks.addGame,
                         cardClick: this.oncardclick
-                    }} key={i}/>
+                    }}
+                    players={this.props.players}
+                    key={i}/>
             )
         } else {
             return (
                 <RoundColumn round={this.props.week.rounds[i]} 
                 callbacks={{
                     scoreChanged: this.props.callbacks.scoreChanged, 
+                    addGame: this.props.callbacks.addGame,
                     cardClick: this.oncardclick
-                }} key={i}/>
+                }}
+                players={this.props.players}
+                key={i}/>
             )
         }
         
