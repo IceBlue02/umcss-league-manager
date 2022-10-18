@@ -10,6 +10,9 @@ interface IPlayer {
     startingelo: number;
     member: MembershipType;
     ap3: boolean;
+    played: number;
+    wins: number;
+    gamessincebye: number;
 }
 
 /**
@@ -49,6 +52,9 @@ class Player {
     byes: (boolean | null)[];
     seed: number;
     playingState: PlayingState = PlayingState.NOTPLAYING;
+    played: number;
+    gamessincebye: number;
+    wins: number;
 
     /**
      * @constructor
@@ -62,7 +68,8 @@ class Player {
      * be adjusted to ensure they are consistant with all other players
      */
 
-    constructor(id: number, name: string, member: MembershipType, ap3: boolean, startingelo: number, currentround?: number) {
+    constructor(id: number, name: string, member: MembershipType, ap3: boolean, startingelo: number,
+                played: number, gamessincebye: number, wins: number, currentround?: number) {
     
         this.id = id;
         this.name = name;
@@ -78,6 +85,9 @@ class Player {
 
         this.inrounds = [];
         this.byes = [];
+        this.played = played;
+        this.gamessincebye = gamessincebye;
+        this.wins = wins;
 
         // If currentround is specified, ensure inrounds and byes are set correctly
         if (currentround != null) {
@@ -97,9 +107,11 @@ class Player {
      */
     static fromJSON(jsonObj: IPlayer, currentround?: number): Player {
         if (typeof(currentround) != "undefined") {
-            return new Player(jsonObj.id, jsonObj.name, jsonObj.member as MembershipType, jsonObj.ap3, jsonObj.startingelo, currentround);
+            return new Player(jsonObj.id, jsonObj.name, jsonObj.member as MembershipType, jsonObj.ap3, jsonObj.startingelo,
+                              jsonObj.played, jsonObj.gamessincebye, jsonObj.wins, currentround);
         } else {
-            return new Player(jsonObj.id, jsonObj.name, jsonObj.member as MembershipType, jsonObj.ap3, jsonObj.startingelo);
+            return new Player(jsonObj.id, jsonObj.name, jsonObj.member as MembershipType, jsonObj.ap3, jsonObj.startingelo,
+                              jsonObj.played, jsonObj.wins, jsonObj.gamessincebye);
         }
     }
 }
