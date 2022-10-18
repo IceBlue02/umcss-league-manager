@@ -60,7 +60,7 @@ function EditPlayerBox (props: EditPlayerBoxProps) {
         const paid = elements.paid.checked
         const ap3 = elements.ap3.checked
     
-        var newPlayer = new Player(id, name, membership as MembershipType, ap3, startingelo)
+        var newPlayer = new Player(id, name, membership as MembershipType, ap3, startingelo, 0, 0, 0)
         newPlayer.paid = paid
     
         props.callbacks.setPlayer(newPlayer)

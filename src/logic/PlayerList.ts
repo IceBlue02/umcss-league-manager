@@ -44,7 +44,7 @@ class PlayerList {
         while (id === -1 || this.isIDAssigned(id)) {
             id = Math.floor(Math.random() * 99999999);
         }
-        return new Player(id, "", MembershipType.NONE, false, 0);
+        return new Player(id, "", MembershipType.NONE, false, 0, 0, 0, 0);
     }
 
     /**
@@ -181,17 +181,46 @@ class PlayerList {
             } else {
                 // Player in this round
                 pl.inrounds.push(true);
+                pl.played++;
                 if (typeof byeID != "undefined") {
                     if (byeID === pl.id) {
                         pl.byes.push(true); // taking a bye
+                        pl.gamessincebye = 0;
                     } else {
                         pl.byes.push(false) // not taking a bye, but someone is
+                        pl.gamessincebye++;
                     }
                 } else {
                     pl.byes.push(null) // no one is taking a bye this round
+                    pl.gamessincebye++;
                 }
             }
         }
+    }
+
+    /**
+     * Sets the individual player data when a new game is added to a round.
+     * 
+     * @see setRoundPlayerInfo
+     * 
+     * @param [pl1ID] - The ID of the first player in the new game
+     * @param [pl2ID] - The ID of the second player not in the game
+     * 
+     * @returns Array of all players who are active
+     */
+    setNewGamePlayerInfo(rndno: number, pl1ID: number, pl2ID: number) {
+        var pl1 = this.getPlayerFromID(pl1ID);
+        var pl2 = this.getPlayerFromID(pl2ID);
+
+        pl1.played++;
+        pl1.gamessincebye++;
+        pl2.played++;
+        pl2.gamessincebye++;
+
+        pl1.byes[rndno-1] = false;
+        pl2.byes[rndno-1] = false;
+        pl1.inrounds[rndno-1] = true
+        pl1.inrounds[rndno-1] = true;
     }
 
     /**

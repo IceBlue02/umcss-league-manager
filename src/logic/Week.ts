@@ -47,21 +47,21 @@ class Week {
 
         var newPL = Object.assign(new PlayerList([]), wk.players)
         for (const p in newPL.players) {
-            Object.assign(new Player(-1, "", MembershipType.NONE, false, 0), p)
+            Object.assign(new Player(-1, "", MembershipType.NONE, false, 0, 0, 0, 0), p)
         }
 
         wk.rounds = []
         for (var i = 0; i < backup.rounds.length; i++) {
             let rnd = Object.assign(new Round(0), backup.rounds[i])
             rnd.games = [];
-            rnd.bye = Object.assign(new Player(-1, "", MembershipType.NONE, false, 0), backup.rounds[i].bye)
+            rnd.bye = Object.assign(new Player(-1, "", MembershipType.NONE, false, 0, 0, 0, 0), backup.rounds[i].bye)
             for (var j = 0; j < backup.rounds[i].games.length; j++) {
                 let gme = new Game(
-                    [new Player(-1, "", MembershipType.NONE, false, 0), new Player(-1, "", MembershipType.NONE, false, 0)],
+                    [new Player(-1, "", MembershipType.NONE, false, 0, 0, 0, 0), new Player(-1, "", MembershipType.NONE, false, 0, 0, 0, 0)],
                     0, 0)
 
                 gme = Object.assign(gme, backup.rounds[i].games[j])
-                gme.players = [Object.assign(new Player(-1, "", MembershipType.NONE, false, 0), backup.rounds[i].games[j].players[0]), Object.assign(new Player(-1, "", MembershipType.NONE, false, 0), backup.rounds[i].games[j].players[1])]
+                gme.players = [Object.assign(new Player(-1, "", MembershipType.NONE, false, 0, 0, 0, 0), backup.rounds[i].games[j].players[0]), Object.assign(new Player(-1, "", MembershipType.NONE, false, 0, 0, 0, 0), backup.rounds[i].games[j].players[1])]
                 rnd.games.push(gme)
             }
             wk.rounds.push(rnd)
@@ -276,7 +276,7 @@ class Week {
     getJSON() {
         // Filters out properties which shouldn't be saved.
         const replacer = (key: string, value: any) => {
-            if (["currentelo", "inrounds", "byes", "playingState"].includes(key)) {
+            if (["currentelo", "inrounds", "byes", "playingState", "seed"].includes(key)) {
                 return undefined;
             }
             return value
