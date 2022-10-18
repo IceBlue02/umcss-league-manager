@@ -19,7 +19,7 @@ type RoundGenPlayer = {
     id: number;
     playedAgainst: Map<number, number>;
     wlProportion: number;
-    playedGamesSinceBye: number;
+    gamesSinceBye: number;
     orderingSeed: number;
 }
 
@@ -72,10 +72,10 @@ abstract class RoundGenerator {
      * @returns ID of the player selected.
      */
     selectBye(): number {
-        const maxGamesSinceBye = Math.max(...this.roundplayers.map(pl => pl.playedGamesSinceBye))
+        const maxGamesSinceBye = Math.max(...this.roundplayers.map(pl => pl.gamesSinceBye))
         var byeCandidates = [];
         for (const pl of this.roundplayers) {
-            if (pl.playedGamesSinceBye === maxGamesSinceBye) {
+            if (pl.gamesSinceBye === maxGamesSinceBye) {
                 byeCandidates.push(pl.id);
             }
         }
@@ -191,18 +191,21 @@ abstract class RoundGenerator {
          * @returns The number of games since the player took a bye.
          */
         const getPlayedGamesSinceBye = (plid: number): number => {
-            const pl = this.week.players.getPlayerFromID(plid);
-            var count = 0;
-            for (var i = pl.byes.length-1; i >= 0; i--) {
-                if (pl.byes[i] == null) {
-                    continue;       // Didn't participate in this round
-                } else if (!pl.byes[i]) {
-                    count++;        // Played in the round
-                } else {
-                    return count    // Bye
-                }
-            }
-            return count
+            // const pl = this.week.players.getPlayerFromID(plid);
+            // var count = 0;
+            // for (var i = pl.byes.length-1; i >= 0; i--) {
+            //     if (pl.byes[i] == null) {
+            //         continue;       // Didn't participate in this round
+            //     } else if (!pl.byes[i]) {
+            //         count++;        // Played in the round
+            //     } else {
+            //         return count    // Bye
+            //     }
+            // }
+            // return count
+
+            const pl = this.week.players.getPlayerFromID(plid); 
+            return pl.gamessincebye;
         }
 
         var roundpls = [];
@@ -214,7 +217,7 @@ abstract class RoundGenerator {
                 orderingSeed: pl.seed,
                 playedAgainst: getPlayedAgainst(pl.id),
                 wlProportion: getWLProportion(pl.id),
-                playedGamesSinceBye: getPlayedGamesSinceBye(pl.id)
+                gamesSinceBye: getPlayedGamesSinceBye(pl.id)
             }
             roundpls.push(roundpl);
         }

@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from 'react';
+import React from 'react';
 import '../styles/RoundColumn.css';
 
 import Game from "../logic/Game";
@@ -161,8 +161,8 @@ class GameAddBox extends React.Component<GameAddBoxProps, GameAddBoxState> {
     }
 
     render() {
-        const disableAddGame =  this.state.player1 === null || this.state.player2 === null || 
-                                this.state.player1.id === this.state.player2.id;
+        // const disableAddGame =  this.state.player1 === null || this.state.player2 === null || 
+        //                         this.state.player1.id === this.state.player2.id;
         return (       
             <div className="game-add-box">
                 <div className="game-add-box-top">
