@@ -181,10 +181,10 @@ class PlayerList {
             } else {
                 // Player in this round
                 pl.inrounds.push(true);
-                pl.played++;
                 if (typeof byeID != "undefined") {
                     if (byeID === pl.id) {
                         pl.byes.push(true); // taking a bye
+                        pl.tempgamessincebye = pl.gamessincebye;
                         pl.gamessincebye = 0;
                     } else {
                         pl.byes.push(false) // not taking a bye, but someone is
@@ -212,9 +212,7 @@ class PlayerList {
         var pl1 = this.getPlayerFromID(pl1ID);
         var pl2 = this.getPlayerFromID(pl2ID);
 
-        pl1.played++;
         pl1.gamessincebye++;
-        pl2.played++;
         pl2.gamessincebye++;
 
         pl1.byes[rndno-1] = false;

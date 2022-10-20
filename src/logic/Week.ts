@@ -146,6 +146,8 @@ class Week {
     calculateRankings(final?: boolean) {
         var currentElo: Map<number, number> = new Map<number, number>();    // Tracks changing ELO live during the round
         var frozenElo: Map<number, number>;                                 // Holds state of ELO before every round
+        var wins: Map<number, number> = new Map<number, number>(); 
+        var played: Map<number, number> = new Map<number, number>();
 
         var scoringlog = ""
         for (const round of this.rounds) {
@@ -158,6 +160,13 @@ class Week {
                 for (const player of game.players) {
                     if (currentElo.get(player.id) === undefined) {
                         currentElo.set(player.id, player.startingelo)
+                    }
+                    if (wins.get(player.id) === undefined) {
+                        wins.set(player.id, player.wins)
+                    }
+
+                    if (played.get(player.id) === undefined) {
+                        played.set(player.id, player.played)
                     }
                 }
             }
@@ -198,6 +207,22 @@ class Week {
                     // Ensure both players have ELO values already
                     const p1Elo = frozenElo.get(game.players[0].id)
                     const p2Elo = frozenElo.get(game.players[1].id)
+
+                    let p1played = played.get(game.players[0].id);
+                    if (p1played !== undefined) {
+                        played.set(game.players[0].id, p1played + 1);
+                    } else {
+                        played.set(game.players[0].id, 1);
+                    }
+
+                    let p2played = played.get(game.players[1].id);
+                    if (p2played !== undefined) {
+                        played.set(game.players[1].id, p2played + 1);
+                    } else {
+                        played.set(game.players[1].id, 1);
+                    }
+
+
                     if (p1Elo === undefined || p2Elo === undefined) {
                         throw new Error("Player not in ELO ranking during ranking calculation")
                     }
@@ -209,6 +234,14 @@ class Week {
                         // Print and add to scoring log
                         console.log(`${game.players[0].name} (${p1Elo}) beat ${game.players[1].name} (${p2Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`)
                         scoringlog = scoringlog + `\n${game.players[0].name} (${p1Elo}) beat ${game.players[1].name} (${p2Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`
+                        
+                        let existingwins = wins.get(game.players[0].id);
+                        if (existingwins !== undefined) {
+                            wins.set(game.players[0].id, existingwins + 1);
+                        } else {
+                            wins.set(game.players[0].id, 1);
+                        }
+                        
                     } 
                     else {                                // Second player (p2) won
                         let rankDiff = p1Elo - p2Elo
@@ -217,6 +250,13 @@ class Week {
 
                         console.log(`${game.players[1].name} (${p2Elo}) beat ${game.players[0].name} (${p1Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`)
                         scoringlog = scoringlog + `\n${game.players[1].name} (${p2Elo}) beat ${game.players[0].name} (${p1Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`
+                    
+                        let existingwins = wins.get(game.players[1].id);
+                        if (existingwins !== undefined) {
+                            wins.set(game.players[1].id, existingwins + 1);
+                        } else {
+                            wins.set(game.players[1].id, 1);
+                        }
                     }
                     
                 }
@@ -232,6 +272,18 @@ class Week {
                 pl.startingelo = pl.currentelo
             }
         }
+        for (const [playerid, w] of wins.entries()) {
+            let pl = this.players.getPlayerFromID(playerid)
+            pl.wins = w
+        }
+
+        console.log(played)
+
+        for (const [playerid, p] of played.entries()) {
+            let pl = this.players.getPlayerFromID(playerid)
+            pl.played = p
+        }
+
         if (final) {
             window.filesys.savePlayerFile(this.players.getJSON())
         }
@@ -251,7 +303,7 @@ class Week {
      * @returns JSON string representation of the week.
      */
     getCSVRankings(): String {
-        var csvdata = "Player,Points,Change From Last Week\n";
+        var csvdata = "Player,Played,Wins,Points,Change From Last Week\n";
         var players = this.players.getPlayers();
 
         players.sort((a, b) => (a.currentelo > b.currentelo) ? -1 : 1);
@@ -259,6 +311,8 @@ class Week {
         for (const p of players) {
             if (p.currentelo !== 0) {
                 let rankstr = p.name + "," + 
+                    p.played.toString() + ',' +
+                    p.wins.toString() + ',' +
                     (Math.round((p.currentelo + Number.EPSILON) * 10000) / 10000).toString() + ",+" + 
                     (Math.round((p.elochange + Number.EPSILON) * 10000) / 10000).toString() + '\n'
 
@@ -276,7 +330,7 @@ class Week {
     getJSON() {
         // Filters out properties which shouldn't be saved.
         const replacer = (key: string, value: any) => {
-            if (["currentelo", "inrounds", "byes", "playingState", "seed"].includes(key)) {
+            if (["currentelo", "inrounds", "byes", "playingState", "seed", "tempgamessincebye"].includes(key)) {
                 return undefined;
             }
             return value

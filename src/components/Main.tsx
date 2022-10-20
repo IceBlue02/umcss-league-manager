@@ -14,7 +14,6 @@ import {
     Route, 
     Routes
 } from "react-router-dom"
-import { useTouchSensor } from 'react-beautiful-dnd';
 
 
 type MainProps = {
@@ -116,9 +115,22 @@ class Main extends React.Component<MainProps, MainState> {
 
         const round = this.state.week.rounds[roundno-1]
         const gamenum = round.getHighestGameNo() + 1;
+        this.state.week.players.setNewGamePlayerInfo(roundno, p1.id, p2.id);
         var game = new Game([p1, p2], roundno, gamenum)
 
         if (round.bye !== null && (round.bye.id === p1.id || round.bye.id === p2.id)) {
+            let pl;
+            if (round.bye.id === p1.id) {
+                pl = this.state.week.players.getPlayerFromID(p1.id)
+            } else {
+                pl = this.state.week.players.getPlayerFromID(p2.id)
+            }
+
+            if (pl.tempgamessincebye !== null) {
+                pl.gamessincebye = pl.tempgamessincebye;
+            }
+            pl.tempgamessincebye = null;
+
             console.log("removing bye")
             this.setState(update(this.state, {
                 week: {

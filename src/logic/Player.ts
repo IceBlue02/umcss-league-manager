@@ -11,8 +11,8 @@ interface IPlayer {
     member: MembershipType;
     ap3: boolean;
     played: number;
-    wins: number;
     gamessincebye: number;
+    wins: number;
 }
 
 /**
@@ -54,6 +54,7 @@ class Player {
     playingState: PlayingState = PlayingState.NOTPLAYING;
     played: number;
     gamessincebye: number;
+    tempgamessincebye: number | null;
     wins: number;
 
     /**
@@ -87,6 +88,7 @@ class Player {
         this.byes = [];
         this.played = played;
         this.gamessincebye = gamessincebye;
+        this.tempgamessincebye = null;
         this.wins = wins;
 
         // If currentround is specified, ensure inrounds and byes are set correctly
@@ -111,7 +113,7 @@ class Player {
                               jsonObj.played, jsonObj.gamessincebye, jsonObj.wins, currentround);
         } else {
             return new Player(jsonObj.id, jsonObj.name, jsonObj.member as MembershipType, jsonObj.ap3, jsonObj.startingelo,
-                              jsonObj.played, jsonObj.wins, jsonObj.gamessincebye);
+                              jsonObj.played, jsonObj.gamessincebye, jsonObj.wins);
         }
     }
 }
