@@ -130,6 +130,15 @@ class GameAddBox extends React.Component<GameAddBoxProps, GameAddBoxState> {
     buildPlayerForm() {
         let items = [];  
         var i = 0;
+        let p1 = this.props.players.getPlayersWithState(PlayingState.PLAYING)[0];
+        if (this.state.player1 !== p1) {
+            this.setState(update(this.state,
+                {player1: {$set: p1},
+                 player2: {$set: p1}}
+            ))
+        }
+
+
         items.push(<optgroup label="Active"/>)       
         for (const pl of this.props.players.getPlayersWithState(PlayingState.PLAYING)) {             
             items.push(<option key={i} value={pl.id}>{pl.name}</option>);   
