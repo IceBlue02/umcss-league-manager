@@ -110,11 +110,14 @@ class GameAddBox extends React.Component<GameAddBoxProps, GameAddBoxState> {
 
     handlePlayerChange(plid: number, playno: number) {
         console.log(plid);
+        var pl;
 
-        var pl = this.props.players.getPlayerFromID(plid)
-        if (pl === null) {
-            console.log("Error: tried to create a game with non existing player " + plid.toString())
+        if (plid === 0) {
+            pl = null;
+        } else {
+            pl = this.props.players.getPlayerFromID(plid)
         }
+
         if (playno === 1) {
             this.setState(update(this.state,
                 {player1: {$set: pl}}
@@ -129,16 +132,16 @@ class GameAddBox extends React.Component<GameAddBoxProps, GameAddBoxState> {
 
     buildPlayerForm() {
         let items = [];  
-        var i = 0;
+        var i = 1;
         let p1 = this.props.players.getPlayersWithState(PlayingState.PLAYING)[0];
-        if (this.state.player1 !== p1) {
-            this.setState(update(this.state,
-                {player1: {$set: p1},
-                 player2: {$set: p1}}
-            ))
-        }
+        // if (this.state.player1 !== p1) {
+        //     this.setState(update(this.state,
+        //         {player1: {$set: p1},
+        //          player2: {$set: p1}}
+        //     ))
+        // }
 
-
+        items.push(<option key={0} value={0}>{ }</option>)
         items.push(<optgroup label="Active"/>)       
         for (const pl of this.props.players.getPlayersWithState(PlayingState.PLAYING)) {             
             items.push(<option key={i} value={pl.id}>{pl.name}</option>);   
@@ -170,8 +173,8 @@ class GameAddBox extends React.Component<GameAddBoxProps, GameAddBoxState> {
     }
 
     render() {
-        // const disableAddGame =  this.state.player1 === null || this.state.player2 === null || 
-        //                         this.state.player1.id === this.state.player2.id;
+        const disableAddGame =  this.state.player1 === null || this.state.player2 === null || 
+                                this.state.player1.id === this.state.player2.id;
         return (       
             <div className="game-add-box">
                 <div className="game-add-box-top">
@@ -190,7 +193,7 @@ class GameAddBox extends React.Component<GameAddBoxProps, GameAddBoxState> {
                             </select>
                         </div>
                         <div className="add-player-form-right">
-                            <button type="button" className="add-game-btn" disabled={false} onClick={this.onNewGame}>+</button>
+                            <button type="button" className="add-game-btn" disabled={disableAddGame} onClick={this.onNewGame}>+</button>
                         </div>
                     </form>
                 }

@@ -67,6 +67,10 @@
     font-size: 24px;
 }
 
+.add-game-btn:disabled {
+    background-color: grey;
+}
+
 .game-add-box {
     padding-left: 5px;
 }

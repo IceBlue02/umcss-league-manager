@@ -125,6 +125,18 @@ class Week {
         this.finished = true;
     }
 
+    /**
+     * Gets an array of player ids who have already had a bye this week.
+     */
+    getPlayersTakenByes() {
+        var players = []
+        for (const round of this.rounds) {
+            if (round.bye !== null) {
+                players.push(round.bye.id)
+            }
+        }
+    }
+
 
     /** 
      * Calculates each player's ELO based on the games played.
