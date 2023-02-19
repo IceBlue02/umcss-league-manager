@@ -1,7 +1,7 @@
 import React from 'react';
-import "../styles/MenuBar.css"
-import "./PlayerSelect"
-import {Link} from "react-router-dom"
+import '../styles/MenuBar.css';
+import './PlayerSelect';
+import { Link } from 'react-router-dom';
 
 type MenuBarProps = {
     callbacks: {
@@ -9,7 +9,7 @@ type MenuBarProps = {
         weekEnd: Function
         backupLoad: Function
     }
-}
+};
 
 class MenuBar extends React.Component<MenuBarProps> {
     constructor(props: MenuBarProps) {
@@ -34,22 +34,23 @@ class MenuBar extends React.Component<MenuBarProps> {
     render() {
         return (
             <div className="menubar">
-                <img id="logo" src={require('../img/logo.png')} alt=""/>
+                <img id="logo" src={require('../img/logo.png')} alt="" />
 
-                <Link id="playerMenuButton"
-                className="btn btn-pink"
-                role="button"
-                to="/players">
+                <Link
+                    id="playerMenuButton"
+                    className="btn btn-pink"
+                    role="button"
+                    to="/players"
+                >
                     Players
                 </Link>
                 <button id="backupRestoreButton" onClick={this.onBackupLoadClick}>Load Backup</button>
 
-                
-                <div className="spacer"></div>
+                <div className="spacer" />
                 <button id="genRoundButton" onClick={this.onGenerateClick}>Generate Next Round</button>
                 <button id="finishWeekButton" onClick={this.onWeekEndClick}>Finish Week</button>
             </div>
-        )
+        );
     }
 }
 

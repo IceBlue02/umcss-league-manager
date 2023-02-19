@@ -1,6 +1,6 @@
 /**
  * Represents the stored properties of players when they are saved.
- * 
+ *
  * @see Player
  */
 
@@ -21,46 +21,58 @@ interface IPlayer {
 enum PlayingState {
     PLAYING,
     AWAY,
-    NOTPLAYING
+    NOTPLAYING,
 }
 
 /**
  * Represents the membership a member has
  */
 enum MembershipType {
-    NONE = "none",
-    MEMBER = "member",
-    ALUMNI = "alumni"
+    NONE = 'none',
+    MEMBER = 'member',
+    ALUMNI = 'alumni',
 }
 
-
-/** 
+/**
  * Represents a player.
  */
 class Player {
     id: number;
+
     name: string;
+
     member: MembershipType;
+
     ap3: boolean;
+
     paid: boolean;
 
     startingelo: number;
+
     currentelo: number;
-    elochange: number = 0;
+
+    elochange = 0;
 
     inrounds: boolean[];
+
     byes: (boolean | null)[];
+
     seed: number;
+
     playingState: PlayingState = PlayingState.NOTPLAYING;
+
     played: number;
+
     gamessincebye: number;
+
     tempgamessincebye: number | null;
+
     wins: number;
 
     /**
      * @constructor
      * Creates a new player.
-     * 
+     *
      * @param id - Player ID, unique, remains constant once assigned
      * @param name - The name of the player
      * @param member - The membership type of a player (either none, member, or alumni)
@@ -69,9 +81,17 @@ class Player {
      * be adjusted to ensure they are consistant with all other players
      */
 
-    constructor(id: number, name: string, member: MembershipType, ap3: boolean, startingelo: number,
-                played: number, gamessincebye: number, wins: number, currentround?: number) {
-    
+    constructor(
+        id: number,
+        name: string,
+        member: MembershipType,
+        ap3: boolean,
+        startingelo: number,
+        played: number,
+        gamessincebye: number,
+        wins: number,
+        currentround?: number,
+    ) {
         this.id = id;
         this.name = name;
         this.startingelo = startingelo;
@@ -82,7 +102,7 @@ class Player {
         this.member = member;
         this.paid = false;
 
-        this.seed = Math.floor(Math.random() * 1000) // Randomly generated per week, used for game ordering
+        this.seed = Math.floor(Math.random() * 1000); // Randomly generated per week, used for game ordering
 
         this.inrounds = [];
         this.byes = [];
@@ -93,7 +113,7 @@ class Player {
 
         // If currentround is specified, ensure inrounds and byes are set correctly
         if (currentround != null) {
-            for (var i = 0; i < currentround; i++) {
+            for (let i = 0; i < currentround; i++) {
                 this.inrounds.push(false);
                 this.byes.push(null);
             }
@@ -102,21 +122,37 @@ class Player {
 
     /**
      * Creates a player object from parsed JSON.
-     * 
+     *
      * @param jsonObj Player interface from the parsed JSON.
      * @param currentround - The current round (see above)
      * @returns Player, with the required attributes
      */
     static fromJSON(jsonObj: IPlayer, currentround?: number): Player {
-        if (typeof(currentround) != "undefined") {
-            return new Player(jsonObj.id, jsonObj.name, jsonObj.member as MembershipType, jsonObj.ap3, jsonObj.startingelo,
-                              jsonObj.played, jsonObj.gamessincebye, jsonObj.wins, currentround);
-        } else {
-            return new Player(jsonObj.id, jsonObj.name, jsonObj.member as MembershipType, jsonObj.ap3, jsonObj.startingelo,
-                              jsonObj.played, jsonObj.gamessincebye, jsonObj.wins);
+        if (typeof (currentround) !== 'undefined') {
+            return new Player(
+                jsonObj.id,
+                jsonObj.name,
+                jsonObj.member as MembershipType,
+                jsonObj.ap3,
+                jsonObj.startingelo,
+                jsonObj.played,
+                jsonObj.gamessincebye,
+                jsonObj.wins,
+                currentround,
+            );
         }
+        return new Player(
+            jsonObj.id,
+            jsonObj.name,
+            jsonObj.member as MembershipType,
+            jsonObj.ap3,
+            jsonObj.startingelo,
+            jsonObj.played,
+            jsonObj.gamessincebye,
+            jsonObj.wins,
+        );
     }
 }
 
-export {Player, PlayingState, MembershipType}
-export type {IPlayer}
+export { Player, PlayingState, MembershipType };
+export type { IPlayer };

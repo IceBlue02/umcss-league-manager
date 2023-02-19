@@ -1,55 +1,51 @@
-import {IPlayer} from './Player';
-import {IWeek} from "./Week";
+import { IPlayer } from './Player';
+import { IWeek } from './Week';
 
 async function getPlayerJSON(): Promise<IPlayer[] | null> {
-    var jsonData: BufferSource | null = null;
+    let jsonData: BufferSource | null = null;
 
     try {
         jsonData = await window.filesys.loadPlayerFile();
         console.log(jsonData);
-    } 
-    catch (e) {
+    } catch (e) {
         if (e instanceof TypeError) {
-            console.log("Error fetching JSON file");
+            console.log('Error fetching JSON file');
             console.log(e.message);
         } else {
-            throw e
+            throw e;
         }
     }
 
     if (jsonData != null) {
-        var data: IPlayer[] = JSON.parse(new TextDecoder().decode(jsonData)).players;
-        return data
-    } else {
-        console.log("Error getting JSON")
+        const data: IPlayer[] = JSON.parse(new TextDecoder().decode(jsonData)).players;
+        return data;
     }
+    console.log('Error getting JSON');
 
-    return null
-} 
+    return null;
+}
 
 async function getBackupJSON(): Promise<IWeek | null> {
-    var jsonData: BufferSource | null = null;
+    let jsonData: BufferSource | null = null;
 
     try {
         jsonData = await window.filesys.loadBackup();
-    } 
-    catch (e) {
+    } catch (e) {
         if (e instanceof TypeError) {
-            console.log("Error loading backup");
+            console.log('Error loading backup');
             console.log(e.message);
         } else {
-            throw e
+            throw e;
         }
     }
 
     if (jsonData != null) {
-        var data: IWeek = JSON.parse(new TextDecoder().decode(jsonData));
-        return data
-    } else {
-        console.log("Error loading backup")
+        const data: IWeek = JSON.parse(new TextDecoder().decode(jsonData));
+        return data;
     }
+    console.log('Error loading backup');
 
-    return null
+    return null;
 }
 
-export {getPlayerJSON, getBackupJSON}
+export { getPlayerJSON, getBackupJSON };

@@ -1,5 +1,5 @@
-import {Week, Round} from "./Week"
-import Game from "./Game";
+import { Week, Round } from './Week';
+import Game from './Game';
 
 const BRUTEFORCEAFTER = 8;
 const EARLYREPEATCONST = 0.1;
@@ -7,7 +7,7 @@ const EARLYREPEATFACTOR = 10;
 
 /**
  * Information used when generating a round
- * 
+ *
  * id: The ID of the player
  * playedAgainst: PlayerID -> Integer, representing the number of times a player has played against
  * the other played (represented buy their player ID)
@@ -21,7 +21,7 @@ type RoundGenPlayer = {
     wlProportion: number;
     gamesSinceBye: number;
     orderingSeed: number;
-}
+};
 
 /**
  * Randomly selects an element from an array.
@@ -29,18 +29,19 @@ type RoundGenPlayer = {
  * @returns One randomly selected element
  */
 function chooseRandom<T>(array: T[]): T {
-    return array[Math.floor(Math.random() * array.length)]
+    return array[Math.floor(Math.random() * array.length)];
 }
 
 /**
  * Generates a new round.
- * 
+ *
  * @see RankedRoundGenerator
  * @see RandomRoundGenerator
  */
 abstract class RoundGenerator {
-    week: Week
-    roundplayers: RoundGenPlayer[]
+    week: Week;
+
+    roundplayers: RoundGenPlayer[];
 
     constructor(week: Week) {
         this.week = week;
@@ -51,7 +52,7 @@ abstract class RoundGenerator {
 
     /**
      * Finds the RoundGenPlayer of the given ID.
-     * 
+     *
      * @param plid ID to return the RoundGenPlayer for.
      * @returns RoundGenPlayer correstponding to the given ID.
      */
@@ -61,32 +62,32 @@ abstract class RoundGenerator {
                 return r;
             }
         }
-        throw new Error("The ID of the RoundGenPlayer could not be found.");
-    }    
+        throw new Error('The ID of the RoundGenPlayer could not be found.');
+    }
 
     /**
      * Selects a player to take a bye.
-     * 
+     *
      * The player who has played the most games since a bye will be chosen. A tie will be broken randomly.
-     * 
+     *
      * @returns ID of the player selected.
      */
     selectBye(): number {
-        const maxGamesSinceBye = Math.max(...this.roundplayers.map(pl => pl.gamesSinceBye))
-        var byeCandidates = [];
+        const maxGamesSinceBye = Math.max(...this.roundplayers.map((pl) => pl.gamesSinceBye));
+        const byeCandidates = [];
         for (const pl of this.roundplayers) {
             if (pl.gamesSinceBye === maxGamesSinceBye) {
                 byeCandidates.push(pl.id);
             }
         }
-        const byePlayerID = chooseRandom(byeCandidates)
-        return byePlayerID
+        const byePlayerID = chooseRandom(byeCandidates);
+        return byePlayerID;
     }
 
     /**
      * Calculates all the required data for round generation, forming
      * RoundGenPlayer objects with the data.
-     * 
+     *
      * @returns A RoundGenPlayer for each active player
      */
     getRoundGenPlayers(): RoundGenPlayer[] {
@@ -98,37 +99,36 @@ abstract class RoundGenerator {
          * all other active players, the values are adjusted down so at least one player has
          * been played zero times (by subtracting the minimum value from all) to avoid unnecessary
          * penalisation.
-         * 
+         *
          * The map follows the form
          * PlayerID : Number of games played against that player
-         * 
+         *
          * @param plid The player to calculate the map against
          * @returns Map of the above form
          */
         const getPlayedAgainst = (plid: number): Map<number, number> => {
-            var playedAgainst = new Map<number, number>();
+            const playedAgainst = new Map<number, number>();
 
             // Initialise the map with all other players, set to 0
-            for (const otherplid of active.map(p => p.id)) { 
+            for (const otherplid of active.map((p) => p.id)) {
                 if (plid !== otherplid) {
-                    playedAgainst.set(otherplid, 0)
+                    playedAgainst.set(otherplid, 0);
                 }
             }
 
             // Check all games for whether the player has participated
             for (const round of this.week.rounds) {
                 for (const game of round.games) {
-                    if (game.players[0].id === plid && playedAgainst.has(game.players[1].id)) {   
-                        const currval = playedAgainst.get(game.players[1].id)
+                    if (game.players[0].id === plid && playedAgainst.has(game.players[1].id)) {
+                        const currval = playedAgainst.get(game.players[1].id);
                         if (currval === undefined) {
-                            throw new Error("Undefined player")
+                            throw new Error('Undefined player');
                         }
                         playedAgainst.set(game.players[1].id, currval + 1); // Increment the value under the opponents ID
-                    } 
-                    else if (game.players[1].id === plid && playedAgainst.has(game.players[0].id)) {    
-                        const currval = playedAgainst.get(game.players[0].id)
+                    } else if (game.players[1].id === plid && playedAgainst.has(game.players[0].id)) {
+                        const currval = playedAgainst.get(game.players[0].id);
                         if (currval === undefined) {
-                            throw new Error("Undefined player")
+                            throw new Error('Undefined player');
                         }
                         playedAgainst.set(game.players[0].id, currval + 1);
                     }
@@ -137,25 +137,26 @@ abstract class RoundGenerator {
 
             // Adjusts the array if everyone has been played at least once, down
             // so that at least one or more players have been played zero times
-            const minNoOfPlayers = Math.min(...Array.from(playedAgainst.values())) 
+            const minNoOfPlayers = Math.min(...Array.from(playedAgainst.values()));
             if (minNoOfPlayers > 0) {
                 for (const [key, value] of playedAgainst.entries()) {
-                    playedAgainst.set(key, value - minNoOfPlayers)
+                    playedAgainst.set(key, value - minNoOfPlayers);
                 }
             }
-            return playedAgainst
-        }
+            return playedAgainst;
+        };
 
         /**
-         * Calculates the win/loss proportion of the player. 
-         * 
+         * Calculates the win/loss proportion of the player.
+         *
          * If no games have been played, the WL value is 0.5.
-         * 
+         *
          * @param plid Player to calculate the WL proportion for
          * @returns Win/Loss proportion of the player.
          */
         const getWLProportion = (plid: number): number => {
-            var wins = 0, losses = 0;
+            let wins = 0; let
+                losses = 0;
             // Iterate over every game
             for (const round of this.week.rounds) {
                 for (const game of round.games) {
@@ -180,10 +181,9 @@ abstract class RoundGenerator {
 
             if (wins + losses === 0) {
                 return 0.5;
-            } else {
-                return wins / (wins + losses);
             }
-        }
+            return wins / (wins + losses);
+        };
 
         /**
          * Calculates the number of games a player has played since they last took a bye.
@@ -204,21 +204,21 @@ abstract class RoundGenerator {
             // }
             // return count
 
-            const pl = this.week.players.getPlayerFromID(plid); 
+            const pl = this.week.players.getPlayerFromID(plid);
             return pl.gamessincebye;
-        }
+        };
 
-        var roundpls = [];
+        const roundpls = [];
 
         // Create a RoundGenPlayer for every active player and fill it out
         for (const pl of active) {
-            var roundpl: RoundGenPlayer = {
+            const roundpl: RoundGenPlayer = {
                 id: pl.id,
                 orderingSeed: pl.seed,
                 playedAgainst: getPlayedAgainst(pl.id),
                 wlProportion: getWLProportion(pl.id),
-                gamesSinceBye: getPlayedGamesSinceBye(pl.id)
-            }
+                gamesSinceBye: getPlayedGamesSinceBye(pl.id),
+            };
             roundpls.push(roundpl);
         }
 
@@ -227,26 +227,27 @@ abstract class RoundGenerator {
 
     /**
      * Order the games based on the ordering seeds.
-     * 
+     *
      * Each player has a randomly assigned (per week) seed, between 0 and
      * 10000. Games are ordered then by the total of the two players seeds.
      * See the README as to why this is useful.
-     * 
+     *
      * @param games Array of generated games
      * @returns Reordered array of games
      */
     static orderGames(games: Game[]): Game[] {
-        let seededgames = [];
+        const seededgames = [];
         // Get the seed total for each game
         for (const game of games) {
             seededgames.push(
-                {   g: game,
-                    val: game.players[0].seed + game.players[1].seed
-                }
-            )
+                {
+                    g: game,
+                    val: game.players[0].seed + game.players[1].seed,
+                },
+            );
         }
 
-        let ordered: {val: number, g: Game}[] = []
+        const ordered: { val: number, g: Game }[] = [];
 
         // Insert each value into the new array, insertion sort esque
         for (const sg of seededgames) {
@@ -255,13 +256,12 @@ abstract class RoundGenerator {
                 ordered.push(sg);
                 continue;
             }
-            for (var i = 0; i < ordered.length; i++) {
-                
+            for (let i = 0; i < ordered.length; i++) {
                 if (sg.val < ordered[i].val) {
                     ordered.splice(i, 0, sg);
                     inserted = true;
                     break;
-                } 
+                }
             }
 
             if (!inserted) {
@@ -270,44 +270,43 @@ abstract class RoundGenerator {
         }
 
         // Renumber all the games to reflect the new order
-        let newgameorder: Game[] = [];
+        const newgameorder: Game[] = [];
         let gmeno = 1;
         for (const osg of ordered) {
-            osg.g.gameno = gmeno
+            osg.g.gameno = gmeno;
             newgameorder.push(osg.g);
             gmeno++;
-        }   
+        }
 
-        return newgameorder
+        return newgameorder;
     }
 }
 
 /**
  * Generates a new round, based on previous performance for the gameweek
- * 
+ *
  * See the README for more details of how our algorithm works.
  */
 class RankedRoundGenerator extends RoundGenerator {
-
     /**
-     * Generates a new round based on the performance of players, using a 
+     * Generates a new round based on the performance of players, using a
      * hybrid between greedy and enumeration approaches. See the README for
      * full details.
      * @returns Generated round
      */
     generate(): Round {
-        var byePlayerID: number;
-        let newRound = new Round(this.week.nextround)
+        let byePlayerID: number;
+        const newRound = new Round(this.week.nextround);
         let players = this.roundplayers;
 
         // Do we have an odd number of players and therefore need to assign a bye?
         if (players.length % 2 === 1) {
             // Yes- select a player to take the bye.
-            byePlayerID = this.selectBye() 
+            byePlayerID = this.selectBye();
             newRound.bye = this.week.players.getPlayerFromID(byePlayerID);
 
             // Remove the bye taking player from the list
-            players = players.filter(p => p.id !== byePlayerID)
+            players = players.filter((p) => p.id !== byePlayerID);
         }
 
         // The matchup matrix contains the penalty for each game
@@ -316,10 +315,10 @@ class RankedRoundGenerator extends RoundGenerator {
         // Until we reach the enumeration stage (recommended: 8), select the best match available
         // (the lowest score), create the game, remove the players from the list and regenerate the matrix
         while (players.length > BRUTEFORCEAFTER) {
-            matrix = this.generateMatchupMatrix(players)
-            let match = this.selectBestMatch(matrix);
-            newRound.createGame([this.week.players.getPlayerFromID(match[0]), this.week.players.getPlayerFromID(match[1])])
-            players = players.filter(p => !match.includes(p.id))
+            matrix = this.generateMatchupMatrix(players);
+            const match = this.selectBestMatch(matrix);
+            newRound.createGame([this.week.players.getPlayerFromID(match[0]), this.week.players.getPlayerFromID(match[1])]);
+            players = players.filter((p) => !match.includes(p.id));
         }
 
         let matches: number[][] | null;
@@ -327,13 +326,13 @@ class RankedRoundGenerator extends RoundGenerator {
 
         // Once the greedy stage has been assigned, enumerate the rest of the possible combinations
         matrix = this.generateMatchupMatrix(players);
-        [val, matches] = this.recursePossibleMatches([], [...players], 0, matrix)
-        
-        // Create games based on the matches 
+        [val, matches] = this.recursePossibleMatches([], [...players], 0, matrix);
+
+        // Create games based on the matches
         if (matches != null) {
             for (const match of matches) {
-                newRound.createGame([this.week.players.getPlayerFromID(match[0]), this.week.players.getPlayerFromID(match[1])])
-                players = players.filter(p => !match.includes(p.id))
+                newRound.createGame([this.week.players.getPlayerFromID(match[0]), this.week.players.getPlayerFromID(match[1])]);
+                players = players.filter((p) => !match.includes(p.id));
             }
         }
 
@@ -341,32 +340,31 @@ class RankedRoundGenerator extends RoundGenerator {
         if (players.length === 0) {
             newRound.games = RoundGenerator.orderGames(newRound.games);
             return newRound;
-        } else {
-            throw new Error("Round could not be generated");
         }
+        throw new Error('Round could not be generated');
     }
 
     /**
      * Generates the matchup matrix.
-     * 
-     * The matchup matrix is a 2D map, indexed using player IDs, which details the 
+     *
+     * The matchup matrix is a 2D map, indexed using player IDs, which details the
      * match value for each possible match. The penalty function works as follows:
-     * 
+     *
      * 1. Difference between the WL proportions
      * 2. If the players have played, penalise by a constant and factor
-     * 
+     *
      * A lower penalty is a better game.
-     * 
+     *
      * Invalid matches (currently only players playing themselves) are signified by -1
-     * 
+     *
      * If the players (and they haven't played all active players)
      * @param players The RoundGenPlayers to be part of the matrix
      * @returns Matchup matrix as described
      */
     generateMatchupMatrix(players: RoundGenPlayer[]): Map<number, Map<number, number>> {
-        var matrix = new Map<number, Map<number, number>>();
+        const matrix = new Map<number, Map<number, number>>();
         for (const pl1 of players) {
-            let row = new Map<number, number>();
+            const row = new Map<number, number>();
             for (const pl2 of players) {
                 if (pl1.id === pl2.id) {
                     row.set(pl2.id, -1);
@@ -374,14 +372,14 @@ class RankedRoundGenerator extends RoundGenerator {
                     let difference = Math.abs(pl1.wlProportion - pl2.wlProportion);
 
                     if (pl1.playedAgainst.get(pl2.id) !== 0) {
-                        difference = (difference + EARLYREPEATCONST) * EARLYREPEATFACTOR
+                        difference = (difference + EARLYREPEATCONST) * EARLYREPEATFACTOR;
                     }
                     row.set(pl2.id, difference);
                 }
             }
-            matrix.set(pl1.id, row)
+            matrix.set(pl1.id, row);
         }
-        return matrix
+        return matrix;
     }
 
     /**
@@ -390,13 +388,13 @@ class RankedRoundGenerator extends RoundGenerator {
      * @returns Array with the two player IDs of the chosen match
      */
     selectBestMatch(matrix: Map<number, Map<number, number>>): number[] {
-        var candidateMatches: number[][] = []
-        var minDiff = 99999999;
+        const candidateMatches: number[][] = [];
+        let minDiff = 99999999;
 
         // Find the minimum value in the matrix
         for (const row of matrix.values()) {
             for (const diff of row.values()) {
-                if (typeof diff === "number" && diff !== -1 && diff < minDiff) {
+                if (typeof diff === 'number' && diff !== -1 && diff < minDiff) {
                     minDiff = diff as number;
                 }
             }
@@ -405,24 +403,24 @@ class RankedRoundGenerator extends RoundGenerator {
         // Find all matches with the minimum value
         for (const [plid1, row] of matrix.entries()) {
             for (const [plid2, diff] of row.entries()) {
-                if (typeof diff === "number" && diff === minDiff) {
+                if (typeof diff === 'number' && diff === minDiff) {
                     candidateMatches.push([plid1, plid2]);
                 }
             }
         }
         // 2 versions of the each match will be included, but it won't affect the outcome
-        return chooseRandom(candidateMatches)
+        return chooseRandom(candidateMatches);
     }
 
     /**
      * Recursively enumerates all possible combinations of matches, returning the set and value with
      * the lowest value.
-     * 
+     *
      * This is a fairly direct port of the algorithm I wrote the old C# version. There are many
      * optimisations that could be made, for example moving to an iterative version, however this algorithm
      * has presented good and fast results with using it for the last 4 matches, so I've focused elsewhere.
-     * 
-     * @param matches - Matches that have already been generated 
+     *
+     * @param matches - Matches that have already been generated
      * @param players - Remaining players not assigned to a match
      * @param val - Current value of generated matches
      * @param matrix - Matchup Matrix @see GenerateMatchupMatrix
@@ -432,44 +430,44 @@ class RankedRoundGenerator extends RoundGenerator {
         // Exit case, where all matches have been assigned
         if (players.length === 0) {
             return [val, matches];
-        } 
+        }
 
         // The number of players should always be even (account for byes beforehand)
         if (players.length % 2 === 1) {
-            throw new Error("Odd number of players in recursion")
+            throw new Error('Odd number of players in recursion');
         }
 
-        var currmatches: number[][] | null = [];
-        var currbestmatches: number[][] = [];
-        var currval = val;
-        var currbestval = 9999999;
+        let currmatches: number[][] | null = [];
+        let currbestmatches: number[][] = [];
+        let currval = val;
+        let currbestval = 9999999;
 
         // Iterate over all pairs of players
         for (const pl1 of players) {
             for (const pl2 of players) {
                 // Match already seen- ignore it
-                if (matches.some(m => m.every(r => r === pl1.id || r === pl2.id))) {
-                    continue; 
+                if (matches.some((m) => m.every((r) => r === pl1.id || r === pl2.id))) {
+                    continue;
                 }
 
-                const row = matrix.get(pl1.id)
+                const row = matrix.get(pl1.id);
                 // If the match between the two players is valid, add a game and recurse
                 if (row && row.get(pl2.id) !== undefined && row.get(pl2.id) !== -1) {
                     // Remove players and add match
-                    let newPlayers = [...players].filter(p => p.id !== pl1.id && p.id !== pl2.id);
-                    let newMatches = [...matches]
-                    newMatches.push([pl1.id, pl2.id])
+                    const newPlayers = [...players].filter((p) => p.id !== pl1.id && p.id !== pl2.id);
+                    const newMatches = [...matches];
+                    newMatches.push([pl1.id, pl2.id]);
 
                     // Add value to running total
-                    let newVal = row.get(pl2.id)
+                    let newVal = row.get(pl2.id);
                     if (newVal !== undefined) {
-                        newVal = val + newVal
+                        newVal = val + newVal;
                     } else {
-                        throw new Error("Game not in matrix")
+                        throw new Error('Game not in matrix');
                     }
 
                     // Test other combinations
-                    [currval, currmatches] = this.recursePossibleMatches(newMatches, newPlayers, newVal, matrix)
+                    [currval, currmatches] = this.recursePossibleMatches(newMatches, newPlayers, newVal, matrix);
                     // Was the returned set better than the current best?
                     if (currval !== -1 && currmatches !== null) {
                         if (currval < currbestval) {
@@ -478,16 +476,13 @@ class RankedRoundGenerator extends RoundGenerator {
                         }
                     }
                 }
-
             }
         }
         // If we've found a best set, return it, otherwise return null
         if (currbestval !== 99999999) {
-            return [currval, currbestmatches]
-        } else {
-            return [99999999, null]
+            return [currval, currbestmatches];
         }
-
+        return [99999999, null];
     }
 }
 
@@ -497,35 +492,35 @@ class RankedRoundGenerator extends RoundGenerator {
  */
 class RandomRoundGenerator extends RoundGenerator {
     generate(): Round {
-        var newRound = new Round(this.week.nextround);
+        const newRound = new Round(this.week.nextround);
 
-            // Randomly shuffle the player list
-            let shuffled = this.roundplayers
-            .map(value => ({ value, sort: Math.random() }))
+        // Randomly shuffle the player list
+        let shuffled = this.roundplayers
+            .map((value) => ({ value, sort: Math.random() }))
             .sort((a, b) => a.sort - b.sort)
-            .map(({ value }) => value)
+            .map(({ value }) => value);
 
-            if (shuffled.length % 2 === 1) { // If odd number of players, assign the first player a bye
-                let byePlayerID = this.selectBye() 
-                newRound.bye = this.week.players.getPlayerFromID(byePlayerID);
-                shuffled = shuffled.filter(p => p.id !== byePlayerID)
-            }
-
-            // Pair the players in consecutive pairs, based on the randomly ordered list, leading to a random set of games
-            var gameno = 1;
-            while (shuffled.length !== 0) { 
-                let game = new Game([this.week.players.getPlayerFromID(shuffled[0].id), 
-                                    this.week.players.getPlayerFromID(shuffled[1].id)], newRound.number, gameno)
-                shuffled = shuffled.slice(2);
-                gameno++
-                newRound.addGame(game);
-            }
-
-            // Order the games based on the ordering scheme
-            newRound.games = RoundGenerator.orderGames(newRound.games);
-
-            return newRound
+        if (shuffled.length % 2 === 1) { // If odd number of players, assign the first player a bye
+            const byePlayerID = this.selectBye();
+            newRound.bye = this.week.players.getPlayerFromID(byePlayerID);
+            shuffled = shuffled.filter((p) => p.id !== byePlayerID);
         }
+
+        // Pair the players in consecutive pairs, based on the randomly ordered list, leading to a random set of games
+        let gameno = 1;
+        while (shuffled.length !== 0) {
+            const game = new Game([this.week.players.getPlayerFromID(shuffled[0].id),
+                this.week.players.getPlayerFromID(shuffled[1].id)], newRound.number, gameno);
+            shuffled = shuffled.slice(2);
+            gameno++;
+            newRound.addGame(game);
+        }
+
+        // Order the games based on the ordering scheme
+        newRound.games = RoundGenerator.orderGames(newRound.games);
+
+        return newRound;
+    }
 }
 
-export {RandomRoundGenerator, RankedRoundGenerator}
+export { RandomRoundGenerator, RankedRoundGenerator };

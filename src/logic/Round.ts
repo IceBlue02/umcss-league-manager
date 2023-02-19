@@ -1,9 +1,11 @@
-import Game from "./Game"
-import {Player} from "./Player"
+import Game from './Game';
+import { Player } from './Player';
 
 class Round {
     games: Game[] = [];
+
     bye: Player | null = null;
+
     number: number;
 
     constructor(number: number) {
@@ -23,22 +25,22 @@ class Round {
     }
 
     getHighestGameNo() {
-        var highest = 0;
+        let highest = 0;
         for (const g of this.games) {
             if (g.gameno > highest) {
                 highest = g.gameno;
             }
         }
-        return highest
+        return highest;
     }
 
     createGame(players: [Player, Player]) {
-        this.games.push(new Game(players, this.number, this.games.length+1));
+        this.games.push(new Game(players, this.number, this.games.length + 1));
     }
 
     getGames(): Game[] {
-        return this.games
+        return this.games;
     }
 }
 
-export default Round
+export default Round;
