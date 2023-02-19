@@ -1,7 +1,7 @@
 import React from 'react';
 import {Player, MembershipType, PlayingState} from "../logic/Player"
 
-import {Draggable} from "react-beautiful-dnd"
+import {Draggable} from "@hello-pangea/dnd"
 
 import "../styles/PlayerCard.css"
 

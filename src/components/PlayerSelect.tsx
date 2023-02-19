@@ -2,7 +2,7 @@ import React from 'react';
 import PlayerList from "../logic/PlayerList";
 import {PlayingState} from "../logic/Player"
 import {Link, Navigate} from "react-router-dom"
-import {DragDropContext, Droppable, DropResult} from "react-beautiful-dnd"
+import {DragDropContext, Droppable, DropResult} from "@hello-pangea/dnd"
 
 import PlayerCard from "./PlayerCard"
 
