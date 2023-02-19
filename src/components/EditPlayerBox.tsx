@@ -20,10 +20,10 @@ interface FormElements extends HTMLFormElement {
     member: HTMLInputElement;
     paid: HTMLInputElement;
     ap3: HTMLInputElement;
+    played: HTMLInputElement;
+    wins: HTMLInputElement;
+    gsb: HTMLInputElement;
 }
-
-
-
 
 
 function EditPlayerBox (props: EditPlayerBoxProps) {
@@ -56,11 +56,28 @@ function EditPlayerBox (props: EditPlayerBoxProps) {
         }
     
         const membership = elements.member.value
-
         const paid = elements.paid.checked
         const ap3 = elements.ap3.checked
+
+        const playedtext = elements.played.value;
+        let played = 0;
+        if (playedtext !== null) {
+            played = parseInt(playedtext);
+        }
+
+        const winstext = elements.wins.value;
+        let wins = 0;
+        if (winstext !== null) {
+            wins = parseInt(winstext);
+        }
+
+        const gsbtext = elements.gsb.value;
+        let gsb = 0;
+        if (gsbtext !== null) {
+            gsb = parseInt(gsbtext);
+        }
     
-        var newPlayer = new Player(id, name, membership as MembershipType, ap3, startingelo, 0, 0, 0)
+        var newPlayer = new Player(id, name, membership as MembershipType, ap3, startingelo, played, gsb, wins);
         newPlayer.paid = paid
     
         props.callbacks.setPlayer(newPlayer)
@@ -78,6 +95,9 @@ function EditPlayerBox (props: EditPlayerBoxProps) {
                 <div className="label">Member: </div>
                 <div className="label">Paid: </div>
                 <div className="label">AP3: </div>
+                <div className="label">Played: </div>
+                <div className="label">Wins: </div>
+                <div className="label">Games since bye: </div>
             </div>
             <div className="editplayerleft">
                 <form onSubmit={e => {onSubmit(e); navigate(-1)}}>
@@ -107,6 +127,18 @@ function EditPlayerBox (props: EditPlayerBoxProps) {
                     <div className="inputholder">
                         <input type="checkbox" id="ap3" name="ap3"
                         defaultChecked={player.ap3}/>
+                    </div>
+                    <div className="inputholder">
+                        <input type="number" id="played" name="played" className="int-input"
+                        min="0" step="1" defaultValue={player.played || 0}/>
+                    </div>
+                    <div className="inputholder">
+                        <input type="number" id="wins" name="wins" className="int-input"
+                        min="0" step="1" defaultValue={player.wins || 0}/>
+                    </div>
+                    <div className="inputholder">
+                        <input type="number" id="gsb" name="gsb" className="int-input"
+                        min="0" step="1" defaultValue={player.gamessincebye || 0}/>
                     </div>
                     <div className="inputholder">
                         <button type="submit" className="save-btn">Save</button>
