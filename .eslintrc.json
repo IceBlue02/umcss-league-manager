@@ -17,8 +17,9 @@
         "no-restricted-syntax": 0,  // For the airbnb for..of error which I prefer using
         "no-console": 0,            // TODO: Remove later
         "no-continue": 0,           // Use cases are syntactically much nicer than without
-        "@typescript-eslint/indent": ["error", 4], // See above
+        "@typescript-eslint/indent": ["error", 4, {"SwitchCase": 0}], // See above
         "react/jsx-indent": ["error", 4],
-        "react/jsx-indent-props": ["error", 4]
+        "react/jsx-indent-props": ["error", 4],
+        "react/destructuring-assignment": 0
     }
 }
