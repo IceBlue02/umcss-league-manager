@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import './styles/index.css';
 
 import Main from "./components/Main"
@@ -28,12 +28,19 @@ getPlayerJSON()
 function renderMain(pl: PlayerList) {
     var week = new Week(pl); 
 
-    ReactDOM.render(
-        <React.StrictMode>
-            <Router>
-                <Main inweek={week}/>        
-            </Router>
-        </React.StrictMode>,
-        document.getElementById('root')
-      );
+    const container = document.getElementById('root');
+    if (container !== null) {
+        const root = createRoot(container);
+
+        root.render(
+            <React.StrictMode>
+                <Router>
+                    <Main inweek={week}/>        
+                </Router>
+            </React.StrictMode>,
+        );
+    } else {
+        console.log("Error: Root container is undefined.")
+    }
+    
 }
