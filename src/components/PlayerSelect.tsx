@@ -132,7 +132,8 @@ class PlayerSelect extends React.Component<PlayerSelectProps, PlayerSelectState>
             case (PlayingState.PLAYING):
                 for (const plid of this.state.order.playing) {
                     rows.push (
-                        <PlayerCard onEdit={this.editPlayerClick} player={this.props.players.getPlayerFromID(plid)} index={i} onPlayingStateChange={this.props.callbacks.playerStateChanged}/>
+                        <PlayerCard onEdit={this.editPlayerClick} player={this.props.players.getPlayerFromID(plid)}
+                        key={plid} index={i} onPlayingStateChange={this.props.callbacks.playerStateChanged}/>
                     )
                     i++;
                 }
@@ -140,7 +141,8 @@ class PlayerSelect extends React.Component<PlayerSelectProps, PlayerSelectState>
             case (PlayingState.NOTPLAYING):
                 for (const plid of this.state.order.notplaying) {
                     rows.push (
-                        <PlayerCard onEdit={this.editPlayerClick} player={this.props.players.getPlayerFromID(plid)} index={i} onPlayingStateChange={this.props.callbacks.playerStateChanged}/>
+                        <PlayerCard onEdit={this.editPlayerClick} player={this.props.players.getPlayerFromID(plid)}
+                        key={plid} index={i} onPlayingStateChange={this.props.callbacks.playerStateChanged}/>
                     )
                     i++;
                 }
@@ -148,7 +150,8 @@ class PlayerSelect extends React.Component<PlayerSelectProps, PlayerSelectState>
             case (PlayingState.AWAY):
                 for (const plid of this.state.order.away) {
                     rows.push (
-                        <PlayerCard onEdit={this.editPlayerClick} player={this.props.players.getPlayerFromID(plid)} index={i} onPlayingStateChange={this.props.callbacks.playerStateChanged}/>
+                        <PlayerCard onEdit={this.editPlayerClick} player={this.props.players.getPlayerFromID(plid)}
+                        key={plid} index={i} onPlayingStateChange={this.props.callbacks.playerStateChanged}/>
                     )
                     i++;
                 }

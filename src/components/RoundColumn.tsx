@@ -142,17 +142,17 @@ class GameAddBox extends React.Component<GameAddBoxProps, GameAddBoxState> {
         // }
 
         items.push(<option key={0} value={0}>{ }</option>)
-        items.push(<optgroup label="Active"/>)       
+        items.push(<optgroup key="optplaying" label="Active"/>)       
         for (const pl of this.props.players.getPlayersWithState(PlayingState.PLAYING)) {             
             items.push(<option key={i} value={pl.id}>{pl.name}</option>);   
             i++;
         }
-        items.push(<optgroup label="Away"/>) 
+        items.push(<optgroup key="optaway" label="Away"/>) 
         for (const pl of this.props.players.getPlayersWithState(PlayingState.AWAY)) {             
             items.push(<option key={i} value={pl.id}>{pl.name}</option>);   
             i++;
         }
-        items.push(<optgroup label="Inactive"/>) 
+        items.push(<optgroup key="optinactive" label="Inactive"/>) 
         for (const pl of this.props.players.getPlayersWithState(PlayingState.NOTPLAYING)) {             
             items.push(<option key={i} value={pl.id}>{pl.name}</option>);   
             i++;

@@ -22,23 +22,23 @@ class PlayerCard extends React.Component<PlayerCardProps> {
 
     getTags() {
         var tags = [];
+        if (this.props.player.ap3) {
+            tags.push(<div key={this.props.player.id.toString() + '-ap3'} className="tag ap3-tag">AP3</div>)
+        }
         switch (this.props.player.member) {
             case (MembershipType.NONE):
                 if (this.props.player.paid) {
-                    tags.push(<div className="tag paid-tag">£</div>)
+                    tags.push(<div key={this.props.player.id.toString() + '-membertag'} className="tag paid-tag">£</div>)
                 } else {
-                    tags.push(<div className="tag not-paid-tag">£</div>)
+                    tags.push(<div key={this.props.player.id.toString() + '-membertag'} className="tag not-paid-tag">£</div>)
                 }
             break;
             case (MembershipType.MEMBER):
-                tags.push(<div className="tag member-tag">M</div>)
+                tags.push(<div key={this.props.player.id.toString() + '-membertag'} className="tag member-tag">M</div>)
             break;
             case (MembershipType.ALUMNI):
-                tags.push(<div className="tag alumni-tag">A</div>)
+                tags.push(<div key={this.props.player.id.toString() + '-membertag'} className="tag alumni-tag">A</div>)
             break;
-        }
-        if (this.props.player.ap3) {
-            tags.push(<div className="tag ap3-tag">AP3</div>)
         }
         return tags;
     }
@@ -64,11 +64,12 @@ class PlayerCard extends React.Component<PlayerCardProps> {
         return (
             <Draggable key={this.props.player.id} draggableId={this.props.player.id.toString()} index={this.props.index}>
                 {(provided) => (
-                    <div className="pl-card" onMouseDown={this.onMouseDown} ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                        <div className="pl-name">{this.props.player.name}</div>
+                    <div className="pl-card" onMouseDown={this.onMouseDown} ref={provided.innerRef} 
+                    key={this.props.player.id.toString() + '-card'} {...provided.draggableProps} {...provided.dragHandleProps}>
+                        <div key={this.props.player.id.toString() + '-name'} className="pl-name">{this.props.player.name}</div>
                         {this.getTags()}
-                        <div className="spacer"></div>
-                        <div className="pl-elo">{Math.round((this.props.player.startingelo + Number.EPSILON) * 10000) / 10000}</div>
+                        <div key={this.props.player.id.toString() + '-spacer'} className="spacer"></div>
+                        <div key={this.props.player.id.toString() + '-elo'} className="pl-elo">{Math.round((this.props.player.startingelo + Number.EPSILON) * 10000) / 10000}</div>
                     </div>
                 )}
             </Draggable>
