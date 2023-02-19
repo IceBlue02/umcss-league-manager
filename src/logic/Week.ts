@@ -2,7 +2,8 @@ import Game from './Game';
 import Round from './Round';
 import { MembershipType, Player } from './Player';
 import PlayerList from './PlayerList';
-import { RankedRoundGenerator, RandomRoundGenerator } from './RoundGenerator';
+import RandomRoundGenerator from './RoundGenerator/RandomRoundGenerator';
+import RankedRoundGenerator from './RoundGenerator/RankedRoundGenerator';
 
 interface IWeek {
     date: Date;
@@ -11,6 +12,10 @@ interface IWeek {
     players: { 'players': Player[] };
     finished: boolean;
     saved: boolean;
+}
+
+function roundToPlaces(value: number, places: number): number {
+    return parseFloat((value).toPrecision(places));
 }
 
 class Week {
@@ -49,16 +54,16 @@ class Week {
         Object.assign(wk, backup);
 
         const newPL = Object.assign(new PlayerList([]), wk.players);
-        for (const p in newPL.players) {
+        for (const p of newPL.players) {
             Object.assign(new Player(-1, '', MembershipType.NONE, false, 0, 0, 0, 0), p);
         }
 
         wk.rounds = [];
-        for (let i = 0; i < backup.rounds.length; i++) {
+        for (let i = 0; i < backup.rounds.length; i += 1) {
             const rnd = Object.assign(new Round(0), backup.rounds[i]);
             rnd.games = [];
             rnd.bye = Object.assign(new Player(-1, '', MembershipType.NONE, false, 0, 0, 0, 0), backup.rounds[i].bye);
-            for (let j = 0; j < backup.rounds[i].games.length; j++) {
+            for (let j = 0; j < backup.rounds[i].games.length; j += 1) {
                 let gme = new Game(
                     [new Player(-1, '', MembershipType.NONE, false, 0, 0, 0, 0), new Player(-1, '', MembershipType.NONE, false, 0, 0, 0, 0)],
                     0,
@@ -84,7 +89,7 @@ class Week {
         // Generate the initial round, with players randomly matched
         const rg = new RandomRoundGenerator(this);
         const round = rg.generate();
-        this.nextround++;
+        this.nextround += 1;
 
         if (round.bye) {
             this.players.setRoundPlayerInfo(round.bye.id);
@@ -103,7 +108,7 @@ class Week {
         // Use a round generator to generate a new round
         const rg = new RankedRoundGenerator(this);
         const round = rg.generate();
-        this.nextround++;
+        this.nextround += 1;
 
         if (round.bye) {
             this.players.setRoundPlayerInfo(round.bye.id);
@@ -160,8 +165,10 @@ class Week {
      * @returns scoring log string, for saving to file
      */
     calculateRankings(final?: boolean) {
-        const currentElo: Map<number, number> = new Map<number, number>(); // Tracks changing ELO live during the round
-        let frozenElo: Map<number, number>; // Holds state of ELO before every round
+        // Tracks changing ELO live during the round
+        const currentElo: Map<number, number> = new Map<number, number>();
+        // Holds state of ELO before every round
+        let frozenElo: Map<number, number>;
         const wins: Map<number, number> = new Map<number, number>();
         const played: Map<number, number> = new Map<number, number>();
 
@@ -215,8 +222,10 @@ class Week {
             }
 
             for (const game of round.games) {
-                if (game.scores[0] === game.scores[1] || game.scores[0] === null || game.scores[1] === null) {
-                    continue; // Game hasn't finished (or has been given the same score- shouldn't happen, but ignore)
+                if (game.scores[0] === game.scores[1]
+                    || game.scores[0] === null || game.scores[1] === null) {
+                    // Game hasn't finished (or has the same score- shouldn't happen, but ignore)
+                    continue;
                 } else {
                     // Ensure both players have ELO values already
                     const p1Elo = frozenElo.get(game.players[0].id);
@@ -241,12 +250,19 @@ class Week {
                     }
 
                     if (game.scores[0] > game.scores[1]) { // First player (p1) won
-                        let rankDiff = p2Elo - p1Elo; // Calculate difference
-                        rankDiff = rankDiff < 0 ? 0 : rankDiff; // Make difference zero if p1Elo is greater
-                        currentElo.set(game.players[0].id, parseFloat((p1Elo + (rankDiff / 5) + 1).toPrecision(5))); // Add and round to 5
+                        // Calculate difference
+                        let rankDiff = p2Elo - p1Elo;
+                        // Make difference zero if p1Elo is greater
+                        rankDiff = rankDiff < 0 ? 0 : rankDiff;
+                        // Add and round to 5
+                        currentElo.set(
+                            game.players[1].id,
+                            roundToPlaces(p1Elo + (rankDiff / 5 + 1), 5),
+                        );
+
                         // Print and add to scoring log
-                        console.log(`${game.players[0].name} (${p1Elo}) beat ${game.players[1].name} (${p2Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`);
-                        scoringlog += `\n${game.players[0].name} (${p1Elo}) beat ${game.players[1].name} (${p2Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`;
+                        console.log(`${game.players[0].name} (${p1Elo}) beat ${game.players[1].name} (${p2Elo}) for a ranking gain of ${roundToPlaces((rankDiff / 5) + 1, 5)}`);
+                        scoringlog += `\n${game.players[0].name} (${p1Elo}) beat ${game.players[1].name} (${p2Elo}) for a ranking gain of ${roundToPlaces((rankDiff / 5) + 1, 5)}`;
 
                         const existingwins = wins.get(game.players[0].id);
                         if (existingwins !== undefined) {
@@ -257,10 +273,13 @@ class Week {
                     } else { // Second player (p2) won
                         let rankDiff = p1Elo - p2Elo;
                         rankDiff = rankDiff < 0 ? 0 : rankDiff;
-                        currentElo.set(game.players[1].id, parseFloat((p2Elo + (rankDiff / 5) + 1).toPrecision(5)));
+                        currentElo.set(
+                            game.players[1].id,
+                            roundToPlaces(p2Elo + (rankDiff / 5 + 1), 5),
+                        );
 
-                        console.log(`${game.players[1].name} (${p2Elo}) beat ${game.players[0].name} (${p1Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`);
-                        scoringlog += `\n${game.players[1].name} (${p2Elo}) beat ${game.players[0].name} (${p1Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`;
+                        console.log(`${game.players[1].name} (${p2Elo}) beat ${game.players[0].name} (${p1Elo}) for a ranking gain of ${roundToPlaces((rankDiff / 5) + 1, 5)}`);
+                        scoringlog += `\n${game.players[1].name} (${p2Elo}) beat ${game.players[0].name} (${p1Elo}) for a ranking gain of ${roundToPlaces((rankDiff / 5) + 1, 5)}`;
 
                         const existingwins = wins.get(game.players[1].id);
                         if (existingwins !== undefined) {
@@ -339,13 +358,17 @@ class Week {
      */
     getJSON() {
         // Filters out properties which shouldn't be saved.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const replacer = (key: string, value: any) => {
             if (['currentelo', 'inrounds', 'byes', 'playingState', 'seed', 'tempgamessincebye'].includes(key)) {
                 return undefined;
             }
             return value;
         };
-        const baseJSON = JSON.stringify({ players: this.players, week: { date: this.date, rounds: this.rounds } }, replacer);
+        const baseJSON = JSON.stringify({
+            players: this.players,
+            week: { date: this.date, rounds: this.rounds },
+        }, replacer);
         window.filesys.saveFile(baseJSON);
     }
 }

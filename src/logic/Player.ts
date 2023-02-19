@@ -102,7 +102,8 @@ class Player {
         this.member = member;
         this.paid = false;
 
-        this.seed = Math.floor(Math.random() * 1000); // Randomly generated per week, used for game ordering
+        // Randomly generated per week, used for game ordering
+        this.seed = Math.floor(Math.random() * 1000);
 
         this.inrounds = [];
         this.byes = [];
@@ -113,7 +114,7 @@ class Player {
 
         // If currentround is specified, ensure inrounds and byes are set correctly
         if (currentround != null) {
-            for (let i = 0; i < currentround; i++) {
+            for (let i = 0; i < currentround; i += 1) {
                 this.inrounds.push(false);
                 this.byes.push(null);
             }
