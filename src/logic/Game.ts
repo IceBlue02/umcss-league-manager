@@ -40,8 +40,8 @@ class Game {
     ) {
         this.players = players;
 
-        // If the scores aren't passed in the constructor (as standard), initialise to [null, null], and
-        // set isFinished to false
+        // If the scores aren't passed in the constructor (as standard),
+        // initialise to [null, null], and set isFinished to false
         if (scores == null) {
             this.scores = [null, null];
             this.hasFinished = false;

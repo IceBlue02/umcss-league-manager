@@ -10,19 +10,12 @@ import { Week } from './logic/Week';
 import { getPlayerJSON } from './logic/FileHandler';
 
 declare global {
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     interface Window {
         filesys? : any
     }
+    /* eslint-enable @typescript-eslint/no-explicit-any */
 }
-
-getPlayerJSON()
-    .then((jsonData) => {
-        if (jsonData !== null) {
-            return new PlayerList(jsonData);
-        }
-        throw new Error('Something went wrong when generating the player list');
-    })
-    .then((pl) => renderMain(pl));
 
 function renderMain(pl: PlayerList) {
     const week = new Week(pl);
@@ -42,3 +35,12 @@ function renderMain(pl: PlayerList) {
         console.log('Error: Root container is undefined.');
     }
 }
+
+getPlayerJSON()
+    .then((jsonData) => {
+        if (jsonData !== null) {
+            return new PlayerList(jsonData);
+        }
+        throw new Error('Something went wrong when generating the player list');
+    })
+    .then((pl) => renderMain(pl));

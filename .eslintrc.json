@@ -12,8 +12,12 @@
         "@typescript-eslint"
     ],
     "rules": {
-        "indent": ["error", 4],
-        "@typescript-eslint/indent": ["error", 4],
+        "import/no-cycle": 0,       // TODO: Look into at later stage
+        "indent": ["error", 4],     // I prefer 4 over 2
+        "no-restricted-syntax": 0,  // For the airbnb for..of error which I prefer using
+        "no-console": 0,            // TODO: Remove later
+        "no-continue": 0,           // Use cases are syntactically much nicer than without
+        "@typescript-eslint/indent": ["error", 4], // See above
         "react/jsx-indent": ["error", 4],
         "react/jsx-indent-props": ["error", 4]
     }

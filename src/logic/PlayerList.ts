@@ -91,7 +91,7 @@ class PlayerList {
             if (pl.id === id) {
                 return indx;
             }
-            indx++;
+            indx += 1;
         }
         throw new Error(`Player ${id} not found`);
     }
@@ -174,7 +174,8 @@ class PlayerList {
      */
     setRoundPlayerInfo(byeID?: number) {
         for (const pl of this.players) {
-            if (pl.playingState === PlayingState.AWAY || pl.playingState === PlayingState.NOTPLAYING) {
+            if (pl.playingState === PlayingState.AWAY
+                || pl.playingState === PlayingState.NOTPLAYING) {
                 // Player not in this round
                 pl.inrounds.push(false);
                 pl.byes.push(null);
@@ -188,11 +189,11 @@ class PlayerList {
                         pl.gamessincebye = 0;
                     } else {
                         pl.byes.push(false); // not taking a bye, but someone is
-                        pl.gamessincebye++;
+                        pl.gamessincebye += 1;
                     }
                 } else {
                     pl.byes.push(null); // no one is taking a bye this round
-                    pl.gamessincebye++;
+                    pl.gamessincebye += 1;
                 }
             }
         }
@@ -212,8 +213,8 @@ class PlayerList {
         const pl1 = this.getPlayerFromID(pl1ID);
         const pl2 = this.getPlayerFromID(pl2ID);
 
-        pl1.gamessincebye++;
-        pl2.gamessincebye++;
+        pl1.gamessincebye += 1;
+        pl2.gamessincebye += 1;
 
         pl1.byes[rndno - 1] = false;
         pl2.byes[rndno - 1] = false;
@@ -235,6 +236,7 @@ class PlayerList {
                 pl.startingelo = pl.currentelo;
             }
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const replacer = (key: string, value: any) => {
             if (['currentelo', 'inrounds', 'byes', 'playingState'].includes(key)) {
                 return undefined;
