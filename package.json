@@ -30,7 +30,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "postinstall": "electron-builder install-app-deps",
-    "electron:dev": "concurrently \"cross-env BROWSER=none yarn start --no-lazy\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron . --inspect=5858 --remote-debugging-port=9223\"",
+    "electron:dev": "concurrently \"cross-env BROWSER=none yarn start --no-lazy\" \"wait-on http://127.0.0.1:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron . --inspect=5858 --remote-debugging-port=9223\"",
     "electron:build": "yarn build && tsc -p electron && electron-builder",
     "electron:dist": "yarn build && tsc -p electron && electron-builder",
     "eject": "react-scripts eject"
