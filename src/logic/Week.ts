@@ -176,15 +176,15 @@ class Week {
             *   Lower ranked player wins: ELO += 1 + (difference in ELO / 5)
             *   Same or higher ranked player wins: ELO += 1
             *   No change to the losing player
-            *   Bye: ELO += 0.5
+            *   Bye: ELO += 1
             *   1 point per week for playing */
 
             if (round.bye) { // Handle the bye player (if present first)
                 const byeElo = currentElo.get(round.bye.id); // Give the bye player half a point
                 if (byeElo !== undefined) {  
-                    currentElo.set(round.bye.id, byeElo + 0.5)
-                    console.log(`${round.bye.name} (${byeElo}) received 0.5 for a bye`)
-                    scoringlog = scoringlog + `\n${round.bye.name} (${byeElo}) received 0.5 for a bye`
+                    currentElo.set(round.bye.id, byeElo + 1)
+                    console.log(`${round.bye.name} (${byeElo}) received 1 for a bye`)
+                    scoringlog = scoringlog + `\n${round.bye.name} (${byeElo}) received 1 for a bye`
                 } else {
                     throw new Error("Player not in ELO ranking during ranking calculation")
                 }
