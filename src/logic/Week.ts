@@ -194,32 +194,45 @@ class Week {
                 if (game.scores[0] === game.scores[1] || game.scores[0] === null || game.scores[1] === null) {
                     continue; // Game hasn't finished (or has been given the same score- shouldn't happen, but ignore)
                 }
-                else {
-                    // Ensure both players have ELO values already
-                    const p1Elo = frozenElo.get(game.players[0].id)
-                    const p2Elo = frozenElo.get(game.players[1].id)
-                    if (p1Elo === undefined || p2Elo === undefined) {
-                        throw new Error("Player not in ELO ranking during ranking calculation")
-                    }
-
-                    if (game.scores[0] > game.scores[1]) { // First player (p1) won
-                        let rankDiff = p2Elo - p1Elo                // Calculate difference
-                        rankDiff = rankDiff < 0 ? 0 : rankDiff      // Make difference zero if p1Elo is greater
-                        currentElo.set(game.players[0].id, parseFloat((p1Elo + (rankDiff / 5) + 1).toPrecision(5))) // Add and round to 5
-                        // Print and add to scoring log
-                        console.log(`${game.players[0].name} (${p1Elo}) beat ${game.players[1].name} (${p2Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`)
-                        scoringlog = scoringlog + `\n${game.players[0].name} (${p1Elo}) beat ${game.players[1].name} (${p2Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`
-                    } 
-                    else {                                // Second player (p2) won
-                        let rankDiff = p1Elo - p2Elo
-                        rankDiff = rankDiff < 0 ? 0 : rankDiff
-                        currentElo.set(game.players[1].id, parseFloat((p2Elo + (rankDiff / 5) + 1).toPrecision(5)))
-
-                        console.log(`${game.players[1].name} (${p2Elo}) beat ${game.players[0].name} (${p1Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`)
-                        scoringlog = scoringlog + `\n${game.players[1].name} (${p2Elo}) beat ${game.players[0].name} (${p1Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`
-                    }
-                    
+                
+                // Ensure both players have ELO values already
+                const p1Elo = frozenElo.get(game.players[0].id)
+                const p2Elo = frozenElo.get(game.players[1].id)
+                if (p1Elo === undefined || p2Elo === undefined) {
+                    throw new Error("Player not in ELO ranking during ranking calculation")
                 }
+
+                const p1 = this.players.getPlayerFromID(game.players[0].id);
+                const p2 = this.players.getPlayerFromID(game.players[1].id);
+
+                // Increment played for both players
+                p1.played += 1;
+                p2.played += 1;
+
+                if (game.scores[0] > game.scores[1]) { // First player (p1) won
+                    let rankDiff = p2Elo - p1Elo                // Calculate difference
+                    rankDiff = rankDiff < 0 ? 0 : rankDiff      // Make difference zero if p1Elo is greater
+                    currentElo.set(game.players[0].id, parseFloat((p1Elo + (rankDiff / 5) + 1).toPrecision(5))) // Add and round to 5
+
+                    // Increment win total
+                    p1.wins += 1;
+
+                    // Print and add to scoring log
+                    console.log(`${game.players[0].name} (${p1Elo}) beat ${game.players[1].name} (${p2Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`)
+                    scoringlog = scoringlog + `\n${game.players[0].name} (${p1Elo}) beat ${game.players[1].name} (${p2Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`
+                } 
+                else {                                // Second player (p2) won
+                    let rankDiff = p1Elo - p2Elo
+                    rankDiff = rankDiff < 0 ? 0 : rankDiff
+                    currentElo.set(game.players[1].id, parseFloat((p2Elo + (rankDiff / 5) + 1).toPrecision(5)))
+
+                    // Increment win total
+                    p2.wins += 1;
+
+                    console.log(`${game.players[1].name} (${p2Elo}) beat ${game.players[0].name} (${p1Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`)
+                    scoringlog = scoringlog + `\n${game.players[1].name} (${p2Elo}) beat ${game.players[0].name} (${p1Elo}) for a ranking gain of ${parseFloat(((rankDiff / 5) + 1).toPrecision(5))}`
+                }
+                    
             }
         }
 
@@ -247,23 +260,41 @@ class Week {
     }
 
     /**
-     * Returns a JSON representation of all data of the week, for backup
-     * @returns JSON string representation of the week.
+     * Returns a CSV representation of the current leaderboard
+     * @returns CSV representation of the current leaderboard
      */
     getCSVRankings(): String {
-        var csvdata = "Player,Points,Change From Last Week\n";
+        var csvdata = " ,Name,Played,Wins,W/L,Points,+/-\n";
         var players = this.players.getPlayers();
+
+        let prevScore = -1;
+        let place = 0;
+        let numPlayers = 0;
 
         players.sort((a, b) => (a.currentelo > b.currentelo) ? -1 : 1);
 
         for (const p of players) {
-            if (p.currentelo !== 0) {
-                let rankstr = p.name + "," + 
-                    (Math.round((p.currentelo + Number.EPSILON) * 10000) / 10000).toString() + ",+" + 
-                    (Math.round((p.elochange + Number.EPSILON) * 10000) / 10000).toString() + '\n'
-
-                csvdata = csvdata + rankstr;
+            if (p.currentelo === 0) {
+                continue
             }
+
+            numPlayers += 1;
+
+            let currScore = (Math.round((p.currentelo + Number.EPSILON) * 1000) / 1000);
+            let change = (Math.round((p.elochange + Number.EPSILON) * 1000) / 1000);
+            let wlrecord = (Math.round(((p.wins / p.played) + Number.EPSILON) * 1000) / 1000);
+
+            if (currScore !== prevScore) {
+                // Only increment the place score if the previous score doesn't match the current one
+                place = numPlayers;
+                prevScore = currScore;
+            }
+
+            let rankstr = place.toString() + "," + p.name + "," + p.played.toString() + "," + p.wins.toString()
+                + "," + wlrecord.toString() + "," + currScore.toString() + "," + change.toString() + "\n";
+
+            csvdata = csvdata + rankstr;
+
         }
 
         return csvdata

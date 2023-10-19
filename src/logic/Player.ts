@@ -10,6 +10,8 @@ interface IPlayer {
     startingelo: number;
     member: MembershipType;
     ap3: boolean;
+    played: number;
+    wins: number;
 }
 
 /**
@@ -45,6 +47,9 @@ class Player {
     currentelo: number;
     elochange: number = 0;
 
+    played: number;
+    wins: number;
+
     inrounds: boolean[];
     byes: (boolean | null)[];
     seed: number;
@@ -62,7 +67,15 @@ class Player {
      * be adjusted to ensure they are consistant with all other players
      */
 
-    constructor(id: number, name: string, member: MembershipType, ap3: boolean, startingelo: number, currentround?: number) {
+    constructor(
+        id: number,
+        name: string,
+        member: MembershipType,
+        ap3: boolean,
+        startingelo: number,
+        played?: number,
+        wins?: number,
+        currentround?: number) {
     
         this.id = id;
         this.name = name;
@@ -74,10 +87,16 @@ class Player {
         this.member = member;
         this.paid = false;
 
+        this.played = 0;
+        this.wins = 0;
+
         this.seed = Math.floor(Math.random() * 1000) // Randomly generated per week, used for game ordering
 
         this.inrounds = [];
         this.byes = [];
+
+        this.played = played !== undefined ? played : 0;
+        this.wins = wins !== undefined ? wins : 0;
 
         // If currentround is specified, ensure inrounds and byes are set correctly
         if (currentround != null) {
@@ -97,9 +116,11 @@ class Player {
      */
     static fromJSON(jsonObj: IPlayer, currentround?: number): Player {
         if (typeof(currentround) != "undefined") {
-            return new Player(jsonObj.id, jsonObj.name, jsonObj.member as MembershipType, jsonObj.ap3, jsonObj.startingelo, currentround);
+            return new Player(jsonObj.id, jsonObj.name, jsonObj.member as MembershipType,
+                jsonObj.ap3, jsonObj.startingelo, jsonObj.played, jsonObj.wins, currentround);
         } else {
-            return new Player(jsonObj.id, jsonObj.name, jsonObj.member as MembershipType, jsonObj.ap3, jsonObj.startingelo);
+            return new Player(jsonObj.id, jsonObj.name, jsonObj.member as MembershipType,
+                jsonObj.ap3, jsonObj.startingelo, jsonObj.played, jsonObj.wins);
         }
     }
 }
