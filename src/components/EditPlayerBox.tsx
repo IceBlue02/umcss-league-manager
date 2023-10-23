@@ -48,6 +48,16 @@ function EditPlayerBox (props: EditPlayerBoxProps) {
         if (name === undefined) {
             name = "";
         }
+
+        var wins = player.wins
+        if (player.wins === undefined || player.wins === null) {
+            wins = 0
+        }
+
+        var played = player.played
+        if (player.played === undefined || player.played === null) {
+            played = 0
+        }
     
         var startingelotxt = elements.elo.value
         var startingelo = 0;
@@ -60,7 +70,7 @@ function EditPlayerBox (props: EditPlayerBoxProps) {
         const paid = elements.paid.checked
         const ap3 = elements.ap3.checked
     
-        var newPlayer = new Player(id, name, membership as MembershipType, ap3, startingelo)
+        var newPlayer = new Player(id, name, membership as MembershipType, ap3, startingelo, played, wins)
         newPlayer.paid = paid
     
         props.callbacks.setPlayer(newPlayer)
