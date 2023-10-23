@@ -49,20 +49,22 @@ function EditPlayerBox (props: EditPlayerBoxProps) {
             name = "";
         }
 
-        var wins = player.wins
-        if (player.wins === undefined || player.wins === null) {
-            wins = 0
+        var playedtxt = elements.played.value
+        var played = 0;
+        if (playedtxt !== null) {
+            played = parseInt(playedtxt);
         }
 
-        var played = player.played
-        if (player.played === undefined || player.played === null) {
-            played = 0
+        var winstxt = elements.wins.value
+        var wins = 0;
+        if (winstxt !== null) {
+            wins = parseInt(winstxt);
         }
     
         var startingelotxt = elements.elo.value
         var startingelo = 0;
         if (startingelotxt !== null) {
-            startingelo = parseFloat(parseFloat(startingelotxt).toPrecision(5));
+            startingelo = parseFloat(parseFloat(startingelotxt).toPrecision(4));
         }
     
         const membership = elements.member.value
@@ -85,6 +87,8 @@ function EditPlayerBox (props: EditPlayerBoxProps) {
                 <div className="label">ID: </div>
                 <div className="label">Name:</div>
                 <div className="label">Starting ELO:</div>
+                <div className="label">Played:</div>
+                <div className="label">Wins:</div>
                 <div className="label">Member: </div>
                 <div className="label">Paid: </div>
                 <div className="label">AP3: </div>
@@ -102,6 +106,14 @@ function EditPlayerBox (props: EditPlayerBoxProps) {
                     <div className="inputholder">
                         <input type="number" id="elo" name="elo"
                         min="0" max="100" step="0.0001" defaultValue={player.startingelo || 0}/>
+                    </div>
+                    <div className="inputholder">
+                        <input type="number" id="played" name="played"
+                        min="0" max="100" step="1" defaultValue={player.played || 0}/>
+                    </div>
+                    <div className="inputholder">
+                        <input type="number" id="wins" name="wins"
+                        min="0" max="100" step="1" defaultValue={player.wins || 0}/>
                     </div>
                     <div className="inputholder">
                         <select name="member" id="member">
