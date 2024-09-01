@@ -5,6 +5,8 @@ const BRUTEFORCEAFTER = 8;
 const EARLYREPEATCONST = 0.1;
 const EARLYREPEATFACTOR = 10;
 
+const BYEDISALLOWLIST: Number[] = []
+
 /**
  * Information used when generating a round
  * 
@@ -75,9 +77,13 @@ abstract class RoundGenerator {
         const maxGamesSinceBye = Math.max(...this.roundplayers.map(pl => pl.playedGamesSinceBye))
         var byeCandidates = [];
         for (const pl of this.roundplayers) {
-            if (pl.playedGamesSinceBye === maxGamesSinceBye) {
+            if (!(BYEDISALLOWLIST.includes(pl.id)) && pl.playedGamesSinceBye === maxGamesSinceBye) {
                 byeCandidates.push(pl.id);
             }
+        } 
+
+        if (byeCandidates.length === 0) {
+            byeCandidates = this.roundplayers.map(pl => pl.id)
         }
         const byePlayerID = chooseRandom(byeCandidates)
         return byePlayerID
