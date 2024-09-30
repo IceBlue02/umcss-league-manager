@@ -20,10 +20,8 @@ interface FormElements extends HTMLFormElement {
     member: HTMLInputElement;
     paid: HTMLInputElement;
     ap3: HTMLInputElement;
+    gamessincebye: HTMLInputElement
 }
-
-
-
 
 
 function EditPlayerBox (props: EditPlayerBoxProps) {
@@ -66,18 +64,22 @@ function EditPlayerBox (props: EditPlayerBoxProps) {
         if (startingelotxt !== null) {
             startingelo = parseFloat(parseFloat(startingelotxt).toPrecision(4));
         }
+
+        let gamessincebyetxt = elements.gamessincebye.value;
+        let gamessincebye = 0;
+        if (gamessincebye !== null) {
+            gamessincebye = parseInt(gamessincebyetxt);
+        }
     
         const membership = elements.member.value
 
         const paid = elements.paid.checked
         const ap3 = elements.ap3.checked
     
-        var newPlayer = new Player(id, name, membership as MembershipType, ap3, startingelo, played, wins)
+        var newPlayer = new Player(id, name, membership as MembershipType, ap3, startingelo, played, wins, gamessincebye)
         newPlayer.paid = paid
     
         props.callbacks.setPlayer(newPlayer)
-        
-        
     }
     
     let navigate = useNavigate();
@@ -89,6 +91,7 @@ function EditPlayerBox (props: EditPlayerBoxProps) {
                 <div className="label">Starting ELO:</div>
                 <div className="label">Played:</div>
                 <div className="label">Wins:</div>
+                <div className="label">Games since bye:</div>
                 <div className="label">Member: </div>
                 <div className="label">Paid: </div>
                 <div className="label">AP3: </div>
@@ -114,6 +117,10 @@ function EditPlayerBox (props: EditPlayerBoxProps) {
                     <div className="inputholder">
                         <input type="number" id="wins" name="wins"
                         min="0" max="100" step="1" defaultValue={player.wins || 0}/>
+                    </div>
+                    <div className="inputholder">
+                        <input type="number" id="gamessincebye" name="gamessincebye"
+                        min="0" max="100" step="1" defaultValue={player.gamessincebye || 0}/>
                     </div>
                     <div className="inputholder">
                         <select name="member" id="member">
