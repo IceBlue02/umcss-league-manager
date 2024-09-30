@@ -198,17 +198,7 @@ abstract class RoundGenerator {
          */
         const getPlayedGamesSinceBye = (plid: number): number => {
             const pl = this.week.players.getPlayerFromID(plid);
-            var count = 0;
-            for (var i = pl.byes.length-1; i >= 0; i--) {
-                if (pl.byes[i] == null) {
-                    continue;       // Didn't participate in this round
-                } else if (!pl.byes[i]) {
-                    count++;        // Played in the round
-                } else {
-                    return count    // Bye
-                }
-            }
-            return count
+            return pl.gamessincebye;
         }
 
         var roundpls = [];
@@ -308,6 +298,7 @@ class RankedRoundGenerator extends RoundGenerator {
             // Yes- select a player to take the bye.
             byePlayerID = this.selectBye() 
             newRound.bye = this.week.players.getPlayerFromID(byePlayerID);
+            this.week.players.resetGSBforPlayerID(byePlayerID);
 
             // Remove the bye taking player from the list
             players = players.filter(p => p.id !== byePlayerID)
@@ -326,15 +317,19 @@ class RankedRoundGenerator extends RoundGenerator {
         }
 
         let matches: number[][] | null;
-        let val: number;
 
         // Once the greedy stage has been assigned, enumerate the rest of the possible combinations
         matrix = this.generateMatchupMatrix(players);
-        [val, matches] = this.recursePossibleMatches([], [...players], 0, matrix)
+        [, matches] = this.recursePossibleMatches([], [...players], 0, matrix)
         
         // Create games based on the matches 
         if (matches != null) {
             for (const match of matches) {
+                const p1 = this.week.players.getPlayerFromID(match[0]);
+                const p2 = this.week.players.getPlayerFromID(match[1]);
+                this.week.players.incrementGSBforPlayerID(p1.id);
+                this.week.players.incrementGSBforPlayerID(p2.id);
+
                 newRound.createGame([this.week.players.getPlayerFromID(match[0]), this.week.players.getPlayerFromID(match[1])])
                 players = players.filter(p => !match.includes(p.id))
             }
@@ -511,14 +506,19 @@ class RandomRoundGenerator extends RoundGenerator {
             if (shuffled.length % 2 === 1) { // If odd number of players, assign the first player a bye
                 let byePlayerID = this.selectBye() 
                 newRound.bye = this.week.players.getPlayerFromID(byePlayerID);
+                this.week.players.resetGSBforPlayerID(byePlayerID);
                 shuffled = shuffled.filter(p => p.id !== byePlayerID)
             }
 
             // Pair the players in consecutive pairs, based on the randomly ordered list, leading to a random set of games
             var gameno = 1;
             while (shuffled.length !== 0) { 
-                let game = new Game([this.week.players.getPlayerFromID(shuffled[0].id), 
-                                    this.week.players.getPlayerFromID(shuffled[1].id)], newRound.number, gameno)
+                const p1 = this.week.players.getPlayerFromID(shuffled[0].id);
+                const p2 = this.week.players.getPlayerFromID(shuffled[1].id);
+                this.week.players.incrementGSBforPlayerID(p1.id);
+                this.week.players.incrementGSBforPlayerID(p2.id);
+
+                let game = new Game([p1, p2], newRound.number, gameno)
                 shuffled = shuffled.slice(2);
                 gameno++
                 newRound.addGame(game);
