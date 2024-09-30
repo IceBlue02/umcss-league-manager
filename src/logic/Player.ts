@@ -12,6 +12,7 @@ interface IPlayer {
     ap3: boolean;
     played: number;
     wins: number;
+    gamessincebye: number;
 }
 
 /**
@@ -49,6 +50,7 @@ class Player {
 
     played: number;
     wins: number;
+    gamessincebye: number;
 
     inrounds: boolean[];
     byes: (boolean | null)[];
@@ -75,6 +77,7 @@ class Player {
         startingelo: number,
         played?: number,
         wins?: number,
+        gamessincebye?: number,
         currentround?: number) {
     
         this.id = id;
@@ -89,6 +92,7 @@ class Player {
 
         this.played = 0;
         this.wins = 0;
+        this.gamessincebye = 0;
 
         this.seed = Math.floor(Math.random() * 1000) // Randomly generated per week, used for game ordering
 
@@ -97,6 +101,7 @@ class Player {
 
         this.played = played !== undefined ? played : 0;
         this.wins = wins !== undefined ? wins : 0;
+        this.gamessincebye = gamessincebye !== undefined ? gamessincebye : 0;
 
         // If currentround is specified, ensure inrounds and byes are set correctly
         if (currentround != null) {
@@ -117,10 +122,12 @@ class Player {
     static fromJSON(jsonObj: IPlayer, currentround?: number): Player {
         if (typeof(currentround) != "undefined") {
             return new Player(jsonObj.id, jsonObj.name, jsonObj.member as MembershipType,
-                jsonObj.ap3, jsonObj.startingelo, jsonObj.played, jsonObj.wins, currentround);
+                jsonObj.ap3, jsonObj.startingelo, jsonObj.played, jsonObj.wins,
+                jsonObj.gamessincebye, currentround);
         } else {
             return new Player(jsonObj.id, jsonObj.name, jsonObj.member as MembershipType,
-                jsonObj.ap3, jsonObj.startingelo, jsonObj.played, jsonObj.wins);
+                jsonObj.ap3, jsonObj.startingelo, jsonObj.played, jsonObj.wins,
+                jsonObj.gamessincebye);
         }
     }
 }

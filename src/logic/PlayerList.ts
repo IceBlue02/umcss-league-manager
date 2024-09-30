@@ -194,6 +194,20 @@ class PlayerList {
         }
     }
 
+    incrementGSBforPlayerID(id: number) {
+        this.players[this.getIndexFromID(id)].gamessincebye++;
+    }
+
+    resetGSBforPlayerID(id: number) {
+        this.players[this.getIndexFromID(id)].gamessincebye = 0;
+    }
+
+    finaliseRanks() {
+        for (var pl of this.players) {
+            pl.startingelo = pl.currentelo
+        }
+    }
+
     /**
      * Returns a JSON representation of the players, for saving to players.json.
      * 
@@ -202,14 +216,9 @@ class PlayerList {
      * @param finaliseranks True if calculated ELO values should be saved, otherwise false
      * @returns JSON string representation of players.
      */
-    getJSON(finaliseranks?: boolean) {
-        if (finaliseranks) {
-            for (var pl of this.players) {
-                pl.startingelo = pl.currentelo
-            }
-        }
+    getJSON() {
         const replacer = (key: string, value: any) => {
-            if (["currentelo", "inrounds", "byes", "playingState"].includes(key)) {
+            if (["currentelo", "inrounds", "byes", "playingState", "seed"].includes(key)) {
                 return undefined;
             }
             return value
