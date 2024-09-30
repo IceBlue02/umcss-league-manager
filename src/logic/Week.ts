@@ -54,7 +54,13 @@ class Week {
         for (var i = 0; i < backup.rounds.length; i++) {
             let rnd = Object.assign(new Round(0), backup.rounds[i])
             rnd.games = [];
-            rnd.bye = Object.assign(new Player(-1, "", MembershipType.NONE, false, 0), backup.rounds[i].bye)
+
+            if (backup.rounds[i].bye !== null) {
+                rnd.bye = Object.assign(new Player(-1, "", MembershipType.NONE, false, 0), backup.rounds[i].bye)
+            } else {
+                rnd.bye = null;
+            }
+            
             for (var j = 0; j < backup.rounds[i].games.length; j++) {
                 let gme = new Game(
                     [new Player(-1, "", MembershipType.NONE, false, 0), new Player(-1, "", MembershipType.NONE, false, 0)],
@@ -161,7 +167,7 @@ class Week {
                     }
                 }
             }
-            if (round.bye) {
+            if (round.bye && round.bye.id !== -1) {
                 if (currentElo.get(round.bye.id) === undefined) {
                     currentElo.set(round.bye.id, round.bye.startingelo)
                 }
