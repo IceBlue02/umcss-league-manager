@@ -14,7 +14,6 @@ import {
     Route, 
     Routes
 } from "react-router-dom"
-import { useTouchSensor } from 'react-beautiful-dnd';
 
 
 type MainProps = {
@@ -170,7 +169,7 @@ class Main extends React.Component<MainProps, MainState> {
                             [indx]: {$set: pl}
                         }
                     }
-            }}), () => {this.backup()})
+            }}), () => {this.savePlayers()})
         } else {
             this.setState(update(this.state, {
                 week: {
@@ -179,8 +178,13 @@ class Main extends React.Component<MainProps, MainState> {
                             $push: [pl]
                         }
                     }
-            }}), () => {this.backup()})
+            }}), () => {this.savePlayers()})
         }
+    }
+
+    savePlayers() {
+        window.filesys.savePlayerFile(this.state.week.players.getJSON())
+        this.backup()
     }
 
     backup() {
@@ -191,9 +195,8 @@ class Main extends React.Component<MainProps, MainState> {
         const minssince = Math.abs((currenttime.getTime() - this.sinceBackup.getTime()) / 60000)
 
         console.log("mins", minssince)
-        if (minssince > 2) {
-            console.log("backup" + currenttime.toISOString().replace(".", "").replace(":", "") + ".json");
-            window.filesys.saveBackup(jsondata, "backup" + currenttime.toISOString().replace(".", "").replace(":", "") + ".json");
+        if (minssince > 0) {
+            window.filesys.saveBackup(jsondata, currenttime.toISOString().substring(0, 16).replaceAll(':', '') + "-backup.json");
             this.sinceBackup = currenttime;
         }
 
