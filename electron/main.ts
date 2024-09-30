@@ -80,7 +80,7 @@ ipcMain.handle("saveCSVFile", (event, file: string) => {
 
 ipcMain.handle("saveBackup", (event, jsonstring, filename?: string) => {
     let filepath;
-    if (filename !== undefined) {
+    if (filename === undefined) {
         filepath = path.join(app.getPath("userData"), "backups", "backup.json")
     } else {
         filepath = path.join(app.getPath("userData"), "backups", filename)
